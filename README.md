@@ -9,7 +9,8 @@ Make sure to add the Core Text framework before adding the class to your project
 I built the sample project using iOS 5.1, but there's no reason it shouldn't work going back to iOS 3.2 I think [but I've only tested the class back to 4.3].
 
 ## As easy as pie
-`	NMCustomLabel *label = [[NMCustomLabel alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+`
+	NMCustomLabel *label = [[NMCustomLabel alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
 	label.text = @"Tacos are <b>delicious</b>, <i>seriously</i>";
 	label.font = [UIFont fontWithName:@"HelveticaNeue" size:12];
 	label.fontBold = [UIFont fontWithName:@"HelveticaNeue-Bold" size:13];

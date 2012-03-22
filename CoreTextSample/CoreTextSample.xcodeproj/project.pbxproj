@@ -18,6 +18,7 @@
 		D4111A38151A7FEB00EF6CC0 /* NMViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D4111A37151A7FEB00EF6CC0 /* NMViewController.m */; };
 		D4111A43151A807400EF6CC0 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4111A42151A807400EF6CC0 /* CoreText.framework */; };
 		D4111A46151A81EA00EF6CC0 /* NMCustomLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = D4111A45151A81EA00EF6CC0 /* NMCustomLabel.m */; };
+		D439A657151B6D0D005BD830 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = D439A656151B6D0D005BD830 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		D4111A42151A807400EF6CC0 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		D4111A44151A81EA00EF6CC0 /* NMCustomLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NMCustomLabel.h; path = ../../src/NMCustomLabel.h; sourceTree = "<group>"; };
 		D4111A45151A81EA00EF6CC0 /* NMCustomLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NMCustomLabel.m; path = ../../src/NMCustomLabel.m; sourceTree = "<group>"; };
+		D439A656151B6D0D005BD830 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +60,7 @@
 		D4111A0F151A7FEB00EF6CC0 = {
 			isa = PBXGroup;
 			children = (
+				D439A656151B6D0D005BD830 /* README.md */,
 				D4111A24151A7FEB00EF6CC0 /* CoreTextSample */,
 				D4111A1D151A7FEB00EF6CC0 /* Frameworks */,
 				D4111A1B151A7FEB00EF6CC0 /* Products */,
@@ -173,6 +176,7 @@
 				D4111A29151A7FEB00EF6CC0 /* InfoPlist.strings in Resources */,
 				D4111A32151A7FEB00EF6CC0 /* MainStoryboard_iPhone.storyboard in Resources */,
 				D4111A35151A7FEB00EF6CC0 /* MainStoryboard_iPad.storyboard in Resources */,
+				D439A657151B6D0D005BD830 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -308,6 +312,7 @@
 				D4111A3D151A7FEB00EF6CC0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
