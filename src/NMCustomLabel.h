@@ -10,19 +10,12 @@
 #import <CoreText/CoreText.h>
 
 @interface NMCustomLabel : UILabel {
-	NSString *cleanText;
-	CTTextAlignment ctTextAlignment;
-	UIColor *textColorBold;
-	CGFloat lineHeight;
 	CGFloat maxLineHeight;
 	
 	CTFramesetterRef framesetter;
 	CFMutableAttributedStringRef attrString;
 	
-	int numberOfLines;
-	
 	BOOL shouldTruncate;
-	BOOL shouldBoldAtNames;
 	
 	CTFontRef bodyFont;
 	CTFontRef bodyFontBold;

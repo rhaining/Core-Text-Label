@@ -8,6 +8,19 @@ TK
 Make sure to add the Core Text framework before adding the class to your project.
 I built the sample project using iOS 5.1, but there's no reason it shouldn't work going back to iOS 3.2 I think [but I've only tested the class back to 4.3].
 
+## As easy as pie
+`	NMCustomLabel *label = [[NMCustomLabel alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+	label.text = @"Tacos are <b>delicious</b>, <i>seriously</i>";
+	label.font = [UIFont fontWithName:@"HelveticaNeue" size:12];
+	label.fontBold = [UIFont fontWithName:@"HelveticaNeue-Bold" size:13];
+	label.fontItalic = [UIFont fontWithName:@"HelveticaNeue-LightItalic" size:12];
+	label.kern = -0.5;
+	label.textColor = [UIColor colorWithRed:153/255.0 green:153/255.0 blue:153/255.0 alpha:1.0];
+	label.textColorBold = [UIColor colorWithRed:53/255.0 green:53/255.0 blue:53/255.0 alpha:1.0];
+	label.lineHeight = 12;
+	[self.view addSubview:label1];
+`
+
 ## About News.me
 [News.me](http://News.me/) is a small team based out of [betaworks](http://betaworks.com/) in New York City. We build applications that improve the way people find and talk about the news.
 
