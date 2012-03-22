@@ -2,7 +2,7 @@
 An iOS class that lets you get started rendering basic Core Text in your apps. It's essentially a subclass of UILabel that allows you to set kerning, line height, & multiple fonts.
 
 ## License
-TK
+Licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
 
 ## A few words
 Make sure to add the Core Text framework before adding the class to your project.
