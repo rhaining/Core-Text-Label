@@ -19,7 +19,7 @@ I built the sample project using iOS 5.1, but there's no reason it shouldn't wor
 	label.textColor = [UIColor colorWithRed:153/255.0 green:153/255.0 blue:153/255.0 alpha:1.0];
 	label.textColorBold = [UIColor colorWithRed:53/255.0 green:53/255.0 blue:53/255.0 alpha:1.0];
 	label.lineHeight = 12;
-	[self.view addSubview:label1];
+	[self.view addSubview:label];
 ```
 
 ## About News.me
