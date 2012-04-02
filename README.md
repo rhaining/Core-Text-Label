@@ -27,4 +27,4 @@ Licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICE
 
 We have an [iPhone app](http://news.me/iphone-download?source=about), an [iPad app](http://news.me/ipad-download?source=about), and a [daily email](http://www.news.me/#email-signup) that deliver the best stories shared by your friends on Twitter and Facebook.
 
-This class was introduced as a part of the [Brooklyn iOS Dev Meetup](http://www.meetup.com/The-Brooklyn-iPhone-and-iPad-Developer-Meetup/) during Rob's talk. See slides & more at (bit.ly/bkiosmeetup)[http://bit.ly/bkiosmeetup].
+This class was introduced as a part of the [Brooklyn iOS Dev Meetup](http://www.meetup.com/The-Brooklyn-iPhone-and-iPad-Developer-Meetup/) during Rob's talk. See slides & more at [bit.ly/bkiosmeetup](http://bit.ly/bkiosmeetup).
