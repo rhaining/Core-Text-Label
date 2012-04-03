@@ -33,7 +33,7 @@ static NSRegularExpression *twitterNameEndRegEx;
 		
 		[self setFont:[UIFont fontWithName:@"HelveticaNeue" size:12]];
 		[self setFontBold:[UIFont fontWithName:@"HelveticaNeue-Bold" size:12]];
-//		[self setFontItalic:[UIFont fontWithName:@"HelveticaNeue-LightItalic" size:12]];
+		[self setFontItalic:[UIFont fontWithName:@"HelveticaNeue-LightItalic" size:12]];
 		
 		self.textColor = [UIColor blackColor];
 		self.textColorBold = [UIColor blackColor];
