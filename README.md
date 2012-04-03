@@ -26,3 +26,5 @@ Licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICE
 [News.me](http://News.me/) is a small team based out of [betaworks](http://betaworks.com/) in New York City. We build applications that improve the way people find and talk about the news.
 
 We have an [iPhone app](http://news.me/iphone-download?source=about), an [iPad app](http://news.me/ipad-download?source=about), and a [daily email](http://www.news.me/#email-signup) that deliver the best stories shared by your friends on Twitter and Facebook.
+
+This class was introduced as a part Rob's talk at the [Brooklyn iOS Dev Meetup](http://www.meetup.com/The-Brooklyn-iPhone-and-iPad-Developer-Meetup/). See slides & more at [bit.ly/bkiosmeetup](http://bit.ly/bkiosmeetup).
