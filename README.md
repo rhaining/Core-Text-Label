@@ -19,9 +19,6 @@ I built the sample project using iOS 5.1, but there's no reason it shouldn't wor
 	[self.view addSubview:label];
 ```
 
-## License
-Licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
-
 ## About News.me
 [News.me](http://News.me/) is a small team based out of [betaworks](http://betaworks.com/) in New York City. We build applications that improve the way people find and talk about the news.
 
@@ -31,3 +28,20 @@ We have an [iPhone app](http://news.me/iphone-download?source=about), an [iPad a
 This class was introduced as a part Rob's talk at the [Brooklyn iOS Dev Meetup](http://www.meetup.com/The-Brooklyn-iPhone-and-iPad-Developer-Meetup/). See slides & more at [bit.ly/bkiosmeetup](http://bit.ly/bkiosmeetup).
 
 If you're using this class, I'd love to [hear about it](https://github.com/rhaining)!
+
+## License Info
+Licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
+
+Copyright 2012 News.me
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+[http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
