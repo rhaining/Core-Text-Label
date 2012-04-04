@@ -30,8 +30,6 @@ This class was introduced as a part Rob's talk at the [Brooklyn iOS Dev Meetup](
 If you're using this class, I'd love to [hear about it](https://github.com/rhaining)!
 
 ## License Info
-Licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
-
 Copyright 2012 News.me
 
 Licensed under the Apache License, Version 2.0 (the "License");
