@@ -7,7 +7,6 @@
 //
 
 #import "NMViewController.h"
-#import "NMCustomLabel.h"
 
 @interface NMViewController ()
 
@@ -19,8 +18,8 @@
 {
     [super viewDidLoad];
 
-	NMCustomLabel *label1 = [[NMCustomLabel alloc] initWithFrame:CGRectMake(30, 15, self.view.frame.size.width-60, 100)];
-	label1.text = @"Lorem ipsum dolor sit amet, <b>consectetur adipiscing elit. Ut et est nisi</b>. Sed porta eleifend mauris vitae lobortis. In hac habitasse platea dictumst. Praesent eget eros sed libero vestibulum porta. Aenean dolor metus, sollicitudin quis accumsan sit amet, faucibus eu purus. Quisque luctus urna mi, et iaculis lacus. Sed sed euismod dolor. <i>Ut urna metus</i>, commodo eget pretium dictum, porttitor at nisi. Aliquam non tempor leo.";
+	NMCustomLabel *label1 = [[NMCustomLabel alloc] initWithFrame:CGRectMake(30, 15, self.view.frame.size.width-60, 200)];
+	label1.text = @"<b>Your bones don't break, mine do.</b> That's clear. Your cells react to bacteria and viruses differently than mine. <i>You don't get sick, I do.</i> That's also clear. But for some reason, you and I react the exact same way to water. We swallow it too fast, we choke. We get some in our lungs, we drown. However unreal it may seem, we are connected, you and I. We're on the same curve, just on opposite ends.";
 	label1.font = [UIFont fontWithName:@"HelveticaNeue" size:12];
 	label1.fontBold = [UIFont fontWithName:@"HelveticaNeue-Bold" size:13];
 	label1.fontItalic = [UIFont fontWithName:@"HelveticaNeue-LightItalic" size:12];
@@ -30,8 +29,8 @@
 	label1.lineHeight = 12;
 	[self.view addSubview:label1];
 	
-	NMCustomLabel *label2 = [[NMCustomLabel alloc] initWithFrame:CGRectMake(30, 125, self.view.frame.size.width-60, 230)];
-	label2.text = @"Sed sed quam libero, vitae malesuada arcu. <b>Suspendisse nec mauris dictum leo dapibus viverra.</b> Quisque sed velit vel nulla rhoncus consequat. Fusce vitae ante vel diam vulputate <b>tincidunt</b> ut quis nulla. Proin feugiat dui ac nibh posuere vel ullamcorper purus dignissim. Curabitur malesuada blandit lacus, nec semper nulla porttitor vitae. Ut nisi ante, tristique quis lacinia eu, volutpat vel metus. <i>Nam ac nisl risus, ac congue massa.</i> In sit amet tellus risus.";
+	NMCustomLabel *label2 = [[NMCustomLabel alloc] initWithFrame:CGRectMake(30, 125, self.view.frame.size.width-60, 250)];
+	label2.text = @"You think water moves fast? You should see ice. It moves like it has a mind. <b>Like it knows it killed the world once and got a taste for murder.</b> After the avalanche, it took us a week to climb out. Now, I don't know exactly when we turned on each other, but I know that seven of us survived the slide... and only five made it out. Now we took an oath, that I'm breaking now. We said we'd say it was the snow that killed the other two, but it wasn't. <i>Nature is lethal but it doesn't hold a candle to man.</i>";
 	label2.font = [UIFont fontWithName:@"HelveticaNeue" size:12];
 	label2.fontBold = [UIFont fontWithName:@"Georgia-Bold" size:16];
 	label2.fontItalic = [UIFont fontWithName:@"Verdana-Italic" size:15];
@@ -41,17 +40,18 @@
 	label2.lineHeight = 16;
 	[self.view addSubview:label2];
 	
-	
-	
-	/*
-	
-	Nunc vitae nisi libero, ac dapibus quam. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Vestibulum pellentesque mattis feugiat. Vestibulum tincidunt quam eu nisi gravida non pretium metus congue. Mauris blandit blandit posuere. Nulla aliquam tristique tortor ut venenatis. Nam condimentum elit sed nulla dignissim in molestie velit tristique. Aenean faucibus justo ut tellus pretium mattis.
-	
-	Nam elementum molestie enim, eu rutrum ligula mattis eu. Suspendisse bibendum facilisis velit, eu euismod metus pretium at. Ut laoreet ornare condimentum. Nam nec velit erat. Nunc eget tincidunt metus. Donec faucibus tristique sapien, in rutrum arcu eleifend et. Mauris lorem tellus, mattis quis posuere ut, molestie eu sapien. Fusce posuere, tortor vitae malesuada eleifend, erat dui porttitor lorem, sit amet fermentum quam dolor a lacus. Curabitur et nisl at diam ullamcorper tincidunt. Suspendisse sapien ligula, sodales quis commodo at, pharetra eget mi. Phasellus eu nibh nec turpis placerat laoreet at at augue. Nunc eu lacus felis. Nunc sapien dolor, suscipit a rutrum eget, consequat a lorem. Quisque sit amet sapien egestas dolor tristique venenatis eget viverra lacus.
-	
-	Nulla facilisi. Donec bibendum, justo nec auctor imperdiet, est nunc imperdiet purus, eu tincidunt risus orci at diam. Praesent pulvinar diam eget neque ullamcorper sed facilisis ipsum venenatis. Suspendisse gravida, libero id blandit vestibulum, dolor magna adipiscing quam, rhoncus varius metus mi id massa. Nam nisi mauris, gravida imperdiet congue vel, suscipit in arcu. Maecenas vel nisl eu erat egestas hendrerit id vitae odio. Vestibulum auctor cursus pulvinar.
-	*/
-
+	NMCustomLabel *label3 = [[NMCustomLabel alloc] initWithFrame:CGRectMake(30, 400, self.view.frame.size.width-60, 50)];
+	label3.text = @"Dig the text? Check out http://slipsum.com/ .. Also, be sure to follow us @NewsDotMe ";
+	label3.shouldBoldAtNames = YES;
+	label3.shouldLinkTypes = kNMShouldLinkURLs | kNMShouldLinkUsernames;
+	label3.delegate = self;
+	label3.linkColor = [UIColor colorWithRed:0 green:102/255.0 blue:153/255.0 alpha:1];
+	label3.activeLinkColor = [UIColor colorWithRed:0 green:170/255.0 blue:255/255.0 alpha:1];
+	label3.font = [UIFont fontWithName:@"HelveticaNeue" size:12];
+	label3.kern = 0.6;
+	label3.textColor = [UIColor colorWithRed:153/255.0 green:153/255.0 blue:153/255.0 alpha:1.0];
+	label3.lineHeight = 16;
+	[self.view addSubview:label3];
 }
 
 - (void)viewDidUnload
@@ -68,5 +68,27 @@
 	    return YES;
 	}
 }
+
+#pragma mark - NMCustomLabelDelegate
+-(void)customLabelDidBeginTouch:(NMCustomLabel *)customLabel recog:(UILongPressGestureRecognizer *)recog{}
+-(void)customLabelDidBeginTouchOutsideOfHighlightedText:(NMCustomLabel *)customLabel recog:(UILongPressGestureRecognizer *)recog{}
+-(void)customLabel:(NMCustomLabel *)customLabel didChange:(UILongPressGestureRecognizer *)recog{}
+-(void)customLabelDidEndTouch:(NMCustomLabel *)customLabel recog:(UILongPressGestureRecognizer *)recog{}
+-(void)customLabelDidEndTouchOutsideOfHighlightedText:(NMCustomLabel *)customLabel recog:(UILongPressGestureRecognizer *)recog{}
+-(void)customLabel:(NMCustomLabel *)customLabel didSelectText:(NSString *)text type:(kNMTextType)textType{
+	switch (textType) {
+		case kNMTextTypeLink:
+			NSLog(@"loading: %@", text);
+			[[UIApplication sharedApplication] openURL:[NSURL URLWithString:text]];
+			break;
+		case kNMTextTypeUsername:
+			NSLog(@"loading: twitter.com/%@", text);
+			[[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://twitter.com/%@", text]]];
+			break;
+		default:
+			break;
+	}
+}
+
 
 @end

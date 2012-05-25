@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "NMCustomLabel.h"
 
-@interface NMViewController : UIViewController
+@interface NMViewController : UIViewController <NMCustomLabelDelegate>
 
 @end

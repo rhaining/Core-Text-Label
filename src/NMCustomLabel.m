@@ -3,7 +3,20 @@
 //  NewsMe
 //
 //  Created by Robert Haining on 8/30/11.
-//  Copyright 2011 News.me. All rights reserved.
+//  Copyright 2012, News.me
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+//
 //
 
 #import "NMCustomLabel.h"
@@ -12,33 +25,82 @@
 -(void)createAttributedString;
 @end
 
-static NSRegularExpression *twitterNameEndRegEx;
+static NSRegularExpression *usernameRegEx;
+static NSRegularExpression *usernameEndRegEx;
+static NSRegularExpression *hashtagRegEx;
+static NSRegularExpression *tagRegEx;
+static NSRegularExpression *markupTagRegEx;
+static NSCharacterSet *emojiCharacterSet;
+static NSCharacterSet *alphaNumericCharacterSet;
 
 @implementation NMCustomLabel
 
-@synthesize  cleanText, ctTextAlignment, textColorBold, lineHeight, numberOfLines, shouldBoldAtNames, kern;
+@synthesize  cleanText, ctTextAlignment, textColorBold, linkColor, activeLinkColor, lineHeight, numberOfLines, shouldBoldAtNames, kern, delegate;
+@synthesize shouldLinkTypes;
 
++(NSRegularExpression *)usernameRegEx{
+	return usernameEndRegEx;
+}
++(NSRegularExpression *)hashtagRegEx{
+	return hashtagRegEx;
+}
 +(void)initialize{
-	if(!twitterNameEndRegEx){
+	if(!usernameRegEx){
 		NSError *error = NULL;
-		twitterNameEndRegEx = [NSRegularExpression regularExpressionWithPattern:@"[^0-9A-Za-z_]" options:NSRegularExpressionCaseInsensitive error:&error];
-		if(!twitterNameEndRegEx){
+		usernameRegEx = [NSRegularExpression regularExpressionWithPattern:@"(@.+?)(?:[^0-9A-Za-z_\\.]|$)" options:NSRegularExpressionCaseInsensitive error:&error];
+		if(!usernameRegEx){
 			NSLog(@"error creating regex: %@", error);
 		}
 	}
+	if(!usernameEndRegEx){
+		NSError *error = NULL;
+		usernameEndRegEx = [NSRegularExpression regularExpressionWithPattern:@"[^0-9A-Za-z_\\.]" options:NSRegularExpressionCaseInsensitive error:&error];
+		if(!usernameEndRegEx){
+			NSLog(@"error creating regex: %@", error);
+		}
+	}
+	if(!hashtagRegEx){
+		NSError *error = NULL;
+		hashtagRegEx = [NSRegularExpression regularExpressionWithPattern:@"[^0-9A-Za-z]" options:NSRegularExpressionCaseInsensitive error:&error];
+		if(!hashtagRegEx){
+			NSLog(@"error creating regex: %@", error);
+		}
+	}
+	if(!tagRegEx){
+		NSError *error = NULL;
+		tagRegEx = [NSRegularExpression regularExpressionWithPattern:@"<.+?>" options:NSRegularExpressionCaseInsensitive error:&error];
+		if(!tagRegEx){
+			NSLog(@"error creating regex: %@", error);
+		}
+	}
+	if(!markupTagRegEx){
+		NSError *error = NULL;
+		markupTagRegEx = [NSRegularExpression regularExpressionWithPattern:@"<([bi])>.+?</[bi]>" options:NSRegularExpressionCaseInsensitive error:&error];
+		if(!markupTagRegEx){
+			NSLog(@"error creating markupTagRegEx: %@", error);
+		}
+	}
+	if(!emojiCharacterSet){
+		emojiCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"😄😊😃☺😉😍😘😚😳😌😁😜😝😒😏😓😔😞😖😥😰😨😣😢😭😂😲😱😠😡😪😷👿👽💛💙💜💗💚❤💔💓💘✨🌟💢❕❔💤💨💦🎶🎵🔥💩👍👎👌👊✊✌👋✋👐👆👇👉👈🙌🙏☝👏💪🚶🏃👫💃👯🙆🙅💁🙇💏💑💆💇💅👦👧👩👨👶👵👴👱👲👳👷👮👼👸💂💀👣💋👄👂👀👃☀☔☁⛄🌙⚡🌀🌊🐱🐶🐭🐹🐰🐺🐸🐯🐨🐻🐷🐮🐗🐵🐒🐴🐎🐫🐑🐘🐍🐦🐤🐔🐧🐛🐙🐠🐟🐳🐬💐🌸🌷🍀🌹🌻🌺🍁🍃🍂🌴🌵🌾🐚🎍💝🎎🎒🎓🎏🎆🎇🎐🎑🎃👻🎅🎄🎁🔔🎉🎈💿📀📷🎥💻📺📱📠☎💽📼🔊📢📣📻📡➿🔍🔓🔒🔑✂🔨💡📲📩📫📮🛀🚽💺💰🔱🚬💣🔫💊💉🏈🏀⚽⚾🎾⛳🎱🏊🏄🎿♠♥♣♦🏆👾🎯🀄🎬📝📖🎨🎤🎧🎺🎷🎸〽👟👡👠👢👕👔👗👘👙🎀🎩👑👒🌂💼👜💄💍💎☕🍵🍺🍻🍸🍶🍴🍔🍟🍝🍛🍱🍣🍙🍘🍚🍜🍲🍞🍳🍢🍡🍦🍧🎂🍰🍎🍊🍉🍓🍆🍅🏠🏫🏢🏣🏥🏦🏪🏩🏨💒⛪🏬🌇🌆🏧🏯🏰⛺🏭🗼🗻🌄🌅🌃🗽🌈🎡⛲🎢🚢🚤⛵✈🚀🚲🚙🚗🚕🚌🚓🚒🚑🚚🚃🚉🚄🚅🎫⛽🚥⚠🚧🔰🎰🚏💈♨🏁🎌🇯🇵🇰🇷🇨🇳🇺🇸🇫🇷🇪🇸🇮🇹🇷🇺🇬🇧🇩🇪1⃣2⃣3⃣4⃣5⃣6⃣7⃣8⃣9⃣0⃣#⃣⬆⬇⬅➡↗↖↘↙◀▶⏪⏩🆗🆕🔝🆙🆒🎦🈁📶🈵🈳🉐🈹🈯🈺🈶🈚🈷🈸🈂🚻🚹🚺🚼🚭🅿♿🚇🚾㊙㊗🔞🆔✳✴💟🆚📳📴💹💱♈♉♊♋♌♍♎♏♐♑♒♓⛎🔯🅰🅱🆎🅾🔲🔴🔳🕛🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚⭕❌©®™"];
+		
+		alphaNumericCharacterSet = [NSCharacterSet alphanumericCharacterSet];
+	}
 }
 -(void)setDefaults{
-	if(!self.backgroundColor){
-		self.backgroundColor = [UIColor whiteColor];
-		
-		[self setFont:[UIFont fontWithName:@"HelveticaNeue" size:12]];
-		[self setFontBold:[UIFont fontWithName:@"HelveticaNeue-Bold" size:12]];
-		[self setFontItalic:[UIFont fontWithName:@"HelveticaNeue-LightItalic" size:12]];
-		
-		self.textColor = [UIColor blackColor];
-		self.textColorBold = [UIColor blackColor];
-		
-	}	
+	self.backgroundColor = [UIColor whiteColor];
+	
+	[self setFont:[UIFont fontWithName:@"HelveticaNeue" size:12]];
+	[self setFontBold:[UIFont fontWithName:@"HelveticaNeue-Bold" size:12]];
+	//	[self setFontItalic:[UIFont fontWithName:@"HelveticaNeue-LightItalic" size:12]];
+	
+	self.textColor = [UIColor blackColor];
+	self.textColorBold = [UIColor blackColor];
+	
+	highlightedTextIndex = NSNotFound;
+}
+-(void)setShouldLinkTypes:(kNMShouldLink)_shouldLinkTypes{
+	shouldLinkTypes = _shouldLinkTypes;
+	self.userInteractionEnabled = YES;
 }
 -(UIColor *)backgroundColor{
 	if(backgroundCGColor){
@@ -70,88 +132,45 @@ static NSRegularExpression *twitterNameEndRegEx;
     return self;
 }
 -(void)dealloc{
-	if(attrString){
-		CFRelease(attrString);
-	}
-	if(framesetter){
-		CFRelease(framesetter);
-	}
-	if(bodyFont){
-		CFRelease(bodyFont);
-	}
-	if(bodyFontItalic){
-		CFRelease(bodyFontItalic);
-	}
-	if(bodyFontBold){
-		CFRelease(bodyFontBold);
-	}
-	if(backgroundCGColor){
-		CGColorRelease(backgroundCGColor);
-	}
+	if(attrString){ CFRelease(attrString); }
+	if(framesetter){ CFRelease(framesetter); }
+	if(bodyFont){ CFRelease(bodyFont); }
+	if(bodyFontItalic){ CFRelease(bodyFontItalic); }
+	if(bodyFontBold){ CFRelease(bodyFontBold); }
+	if(backgroundCGColor){ CGColorRelease(backgroundCGColor); }
+	if(ctFrame){ CFRelease(ctFrame); }
 }
--(UIFont *)font{
-	if(bodyFont){
-		CFStringRef nameRef = CTFontCopyName(bodyFont, kCTFontFullNameKey);
+-(CTFontRef)newCTFontWithUIFont:(UIFont *)font{
+	return CTFontCreateWithName((__bridge CFStringRef)font.fontName, font.pointSize, NULL);
+}
+-(UIFont *)uiFontWithCTFont:(CTFontRef)ctFont{
+	if(ctFont){
+		CFStringRef nameRef = CTFontCopyName(ctFont, kCTFontFullNameKey);
 		NSString *name = (__bridge NSString *)nameRef;
-		UIFont *font = [UIFont fontWithName:name size:CTFontGetSize(bodyFont)];
+		UIFont *font = [UIFont fontWithName:name size:CTFontGetSize(ctFont)];
 		CFRelease(nameRef);
 		return font;
 	}else{
 		return nil;
 	}
 }
-#define MAX_LINE_HEIGHT_OFFSET 3
+-(UIFont *)font{ return [self uiFontWithCTFont:bodyFont]; }
+-(UIFont *)fontBold{ return [self uiFontWithCTFont:bodyFontBold]; }
+-(UIFont *)fontItalic{ return [self uiFontWithCTFont:bodyFontItalic]; }
+
 -(void)setFont:(UIFont *)font{
-	if(bodyFont){
-		CFRelease(bodyFont);
-	}
-	bodyFont = CTFontCreateWithName((__bridge CFStringRef)font.fontName, font.pointSize, NULL);
-	
-	if(maxLineHeight < font.lineHeight){
-		maxLineHeight = font.lineHeight-MAX_LINE_HEIGHT_OFFSET;
-	}
-}
--(UIFont *)fontBold{
-	if(bodyFontBold){
-		CFStringRef nameRef = CTFontCopyName(bodyFontBold, kCTFontFullNameKey);
-		NSString *name = (__bridge NSString *)nameRef;
-		UIFont *font = [UIFont fontWithName:name size:CTFontGetSize(bodyFontBold)];
-		CFRelease(nameRef);
-		return font;
-	}else{
-		return nil;
-	}
+	if(bodyFont){ CFRelease(bodyFont); }
+	bodyFont = [self newCTFontWithUIFont:font];
 }
 -(void)setFontBold:(UIFont *)fontBold{
 	if(bodyFontBold){
 		CFRelease(bodyFontBold);
 	}
-	bodyFontBold = CTFontCreateWithName((__bridge CFStringRef)fontBold.fontName, fontBold.pointSize, NULL);
-	
-	if(maxLineHeight < fontBold.lineHeight){
-		maxLineHeight = fontBold.lineHeight-MAX_LINE_HEIGHT_OFFSET;
-	}
+	bodyFontBold = [self newCTFontWithUIFont:fontBold];
 }
--(UIFont *)fontItalic{
-	if(bodyFontItalic){
-		CFStringRef nameRef = CTFontCopyName(bodyFontItalic, kCTFontFullNameKey);
-		NSString *name = (__bridge NSString *)nameRef;
-		UIFont *font = [UIFont fontWithName:name size:CTFontGetSize(bodyFontItalic)];
-		CFRelease(nameRef);
-		return font;
-	}else{
-		return nil;
-	}
-}
--(void)setFontItalic:(UIFont *)fontItalic{
-	if(bodyFontItalic){
-		CFRelease(bodyFontItalic);
-	}
-	bodyFontItalic = CTFontCreateWithName((__bridge CFStringRef)fontItalic.fontName, fontItalic.pointSize, NULL);	
-	
-	if(maxLineHeight < fontItalic.lineHeight){
-		maxLineHeight = fontItalic.lineHeight-MAX_LINE_HEIGHT_OFFSET;
-	}
+-(void)setFontItalic:(UIFont *)font{
+	if(bodyFontItalic){ CFRelease(bodyFontItalic); }
+	bodyFontItalic = [self newCTFontWithUIFont:font];
 }
 -(void)clearAttrString{
 	if(attrString){
@@ -167,16 +186,10 @@ static NSRegularExpression *twitterNameEndRegEx;
 	[super setText:_text];
 	
 	if(self.text && self.text.length > 0){
-		NSMutableString *_cleanText = [_text mutableCopy];
-		[_cleanText replaceOccurrencesOfString:@"<b>" withString:@"" options:NSLiteralSearch range:NSMakeRange(0, _cleanText.length)];
-		[_cleanText replaceOccurrencesOfString:@"</b>" withString:@"" options:NSLiteralSearch range:NSMakeRange(0, _cleanText.length)];
-		[_cleanText replaceOccurrencesOfString:@"<i>" withString:@"" options:NSLiteralSearch range:NSMakeRange(0, _cleanText.length)];
-		[_cleanText replaceOccurrencesOfString:@"</i>" withString:@"" options:NSLiteralSearch range:NSMakeRange(0, _cleanText.length)];
-		if(self.shouldBoldAtNames){
-			[_cleanText replaceOccurrencesOfString:@"@" withString:@"" options:NSLiteralSearch range:NSMakeRange(0, _cleanText.length)];
-		}
-		cleanText = [_cleanText copy];
-
+		cleanText = [tagRegEx stringByReplacingMatchesInString:self.text
+													   options:0
+														 range:NSMakeRange(0, [self.text length])
+												  withTemplate:@""];
 		[self clearAttrString];
 	}else{
 		if(cleanText){
@@ -192,26 +205,40 @@ static NSRegularExpression *twitterNameEndRegEx;
 		}
 	}
 	[self setNeedsDisplay];
+	highlightedTextIndex = NSNotFound;
+}
+-(void)didUpdateColor{
+	if(attrString){
+		[self clearAttrString];
+		[self setNeedsDisplay];
+	}
 }
 -(void)setTextColor:(UIColor *)_textColor{
 	if([self.textColor isEqual:_textColor]){
 		return;
 	}
 	[super setTextColor:_textColor];
-	if(attrString){
-		[self clearAttrString];
-		[self setNeedsDisplay];
-	}
+	[self didUpdateColor];
 }
 -(void)setTextColorBold:(UIColor *)_textColorBold{
 	if([textColorBold isEqual:_textColorBold]){
 		return;
 	}
 	textColorBold = _textColorBold;
-	if(attrString){
-		[self clearAttrString];
-		[self setNeedsDisplay];
+	[self didUpdateColor];
+}
+-(void)setLinkColor:(UIColor *)color{
+	if([linkColor isEqual:color]){
+		return;
 	}
+	linkColor = color;
+	[self didUpdateColor];
+}
+-(void)setActiveLinkColor:(UIColor *)color{
+	if([activeLinkColor isEqual:color]){
+		return;
+	}
+	activeLinkColor = color;
 }
 
 -(void)createAttributedString{
@@ -219,7 +246,7 @@ static NSRegularExpression *twitterNameEndRegEx;
 		//no text. return.
 		return; 
 	}
-//	NSLog(@"customlabel - create - %@", text);
+	//	NSLog(@"customlabel - create - %@", text);
 	
 	[self clearAttrString];
 	attrString = CFAttributedStringCreateMutable(kCFAllocatorDefault, 0);
@@ -232,96 +259,111 @@ static NSRegularExpression *twitterNameEndRegEx;
 	//set default font
 	CFAttributedStringSetAttribute(attrString, CFRangeMake(0, CFAttributedStringGetLength(attrString)), kCTFontAttributeName, bodyFont);
 	
-	int locOfTag = -1;
-	int totalTagLength = 0;
-	int eachTagLength = 7;
+	__block int locOfTag = -1;
+	__block int totalTagLength = 0;
+	static int eachTagLength = 7;
 	
-	NSRange range0 = NSMakeRange(0, 0);
-	while(range0.location != NSNotFound){
-		NSRange range1 = [self.text rangeOfString:@"<b>" options:NSLiteralSearch range:NSMakeRange(range0.location+range0.length, self.text.length - range0.location- range0.length)];
-		if(range1.location != NSNotFound){
-			NSRange range2 = [self.text rangeOfString:@"</b>" options:NSLiteralSearch range:NSMakeRange(range1.location+range1.length, self.text.length - range1.location- range1.length)];
-			if(range2.location != NSNotFound){
-				CFRange boldRange = CFRangeMake(range1.location, range2.location-range1.location-3);
-				if(locOfTag >= 0 && locOfTag < boldRange.location){
-					boldRange.location -= totalTagLength;
-				}
-				locOfTag = boldRange.location + boldRange.length;
-				totalTagLength += eachTagLength;
-
-				NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)bodyFontBold, kCTFontAttributeName, [textColorBold CGColor], kCTForegroundColorAttributeName, nil];
-				CFAttributedStringSetAttributes(attrString, boldRange, (__bridge CFDictionaryRef)attributes, NO);
-				range0 = range2;
-			}else{
-				break;
+	[markupTagRegEx enumerateMatchesInString:self.text options:0 range:NSMakeRange(0, [self.text length]) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop){
+		
+		NSRange markupRange = [match range];
+		markupRange.length -= eachTagLength;
+		markupRange.location -= totalTagLength;
+		locOfTag = markupRange.location + markupRange.length;
+		totalTagLength += eachTagLength;
+		
+		CTFontRef font=nil;
+		UIColor *color=nil;
+		if(match.numberOfRanges > 1){
+			NSRange tagTypeRange = [match rangeAtIndex:1];
+			NSString *tagType = [[self.text substringWithRange:tagTypeRange] lowercaseString];
+			if([tagType isEqualToString:@"b"]){
+				font = bodyFontBold;
+				color = textColorBold;
+			}else if([tagType isEqualToString:@"i"]){
+				font = bodyFontItalic;
+				color = self.textColor;
 			}
-		}else{
-			break;
 		}
-	}
-	if(bodyFontItalic){
-		range0 = NSMakeRange(0, 0);
-		//	locOfTag = -1;
-		while(range0.location != NSNotFound){
-			NSRange range1 = [self.text rangeOfString:@"<i>" options:NSLiteralSearch range:NSMakeRange(range0.location+range0.length, self.text.length - range0.location- range0.length)];
-			if(range1.location != NSNotFound){
-				NSRange range2 = [self.text rangeOfString:@"</i>" options:NSLiteralSearch range:NSMakeRange(range1.location+range1.length, self.text.length - range1.location- range1.length)];
-				if(range2.location != NSNotFound){
-					CFRange italRange = CFRangeMake(range1.location, range2.location-range1.location-3);
-					if(locOfTag >= 0 && locOfTag < italRange.location){
-						italRange.location -= totalTagLength;
+		if(font && color){
+			NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)font, kCTFontAttributeName, [color CGColor], kCTForegroundColorAttributeName, nil];
+			CFAttributedStringSetAttributes(attrString, CFRangeMake(markupRange.location, markupRange.length), (__bridge CFDictionaryRef)attributes, NO);
+		}
+	}];
+	
+	if(self.shouldBoldAtNames && (self.shouldLinkTypes & kNMShouldLinkUsernames) ){
+		[usernameRegEx enumerateMatchesInString:self.text options:0 range:NSMakeRange(0, [self.text length]) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop){
+			
+			if(match.numberOfRanges > 1){
+				NSRange range = [match rangeAtIndex:1];
+				if(range.length > 1){ //aka not just an '@' symbol					
+					NSDictionary *attributes;
+					if(linkColor){
+						UIColor *tehLinkColor = linkColor;
+						if(highlightedTextIndex != NSNotFound){
+							if(highlightedTextIndex >= range.location && highlightedTextIndex < range.location+range.length){
+								highlightedTextType = kNMTextTypeUsername;
+								tehLinkColor = activeLinkColor;
+								highlightedText = [cleanText substringWithRange:NSMakeRange(range.location, range.length)];
+							}
+						}
+						attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)[tehLinkColor CGColor], kCTForegroundColorAttributeName, nil];
+					}else{
+						attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)bodyFontBold, kCTFontAttributeName, (__bridge id)[textColorBold CGColor], kCTForegroundColorAttributeName, nil];
 					}
-					locOfTag = italRange.location + italRange.length;
-					totalTagLength += eachTagLength;
-					//				NSLog(@"i %@ boldRange = %d,%d - length = %d", self.text, (int)italRange.location, (int)italRange.length, self.cleanText.length);
-					
-					CFAttributedStringSetAttribute(attrString, italRange, kCTFontAttributeName, bodyFontItalic);
-					range0 = range2;
-				}else{
-					break;
+					CFAttributedStringSetAttributes(attrString, CFRangeMake(range.location, range.length), (__bridge CFDictionaryRef)attributes, NO);
 				}
-			}else{
-				break;
 			}
-		}
+		}];
 	}
-
-	if(self.shouldBoldAtNames){
-		NSRange range0 = NSMakeRange(0, 0);
-		while(range0.location != NSNotFound){
-			NSRange range1 = [self.text rangeOfString:@"@" options:NSLiteralSearch range:NSMakeRange(range0.location+range0.length, self.text.length - range0.location- range0.length)];
-			if(range1.location != NSNotFound){
-				NSRange range2 = [twitterNameEndRegEx rangeOfFirstMatchInString:self.text options:0 range:NSMakeRange(range1.location+range1.length, self.text.length - range1.location- range1.length)];
-				if(range2.location != NSNotFound){
-					CFRange boldRange = CFRangeMake(range1.location, range2.location-range1.location-1);
-					if(locOfTag >= 0 && locOfTag < boldRange.location){
-						boldRange.location -= totalTagLength;
+	
+	if(self.shouldLinkTypes & kNMShouldLinkURLs){
+		NSError *error = NULL;
+		NSDataDetector *detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:&error];
+		[detector enumerateMatchesInString:self.cleanText options:0 range:NSMakeRange(0, [self.cleanText length]) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop){
+			
+			NSRange matchRange = [match range];
+			NSDictionary *attributes;
+			if(linkColor){
+				UIColor *tehLinkColor = linkColor;
+				if(highlightedTextIndex != NSNotFound){
+					if(highlightedTextIndex >= matchRange.location && highlightedTextIndex < matchRange.location+matchRange.length){
+						highlightedTextType = kNMTextTypeLink;
+						tehLinkColor = activeLinkColor;
+						highlightedText = [cleanText substringWithRange:NSMakeRange(matchRange.location, matchRange.length)];
 					}
-					locOfTag = boldRange.location + boldRange.length;
-					totalTagLength += 1;
-//					NSLog(@"@ %@ boldRange = %d,%d - length = %d", self.text, (int)boldRange.location, (int)boldRange.length, self.cleanText.length);
-
-					NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)bodyFontBold, kCTFontAttributeName, [textColorBold CGColor], kCTForegroundColorAttributeName, nil];
-					CFAttributedStringSetAttributes(attrString, boldRange, (__bridge CFDictionaryRef)attributes, NO);
-
-					range0 = range2;
-				}else{
-					break;
 				}
+				attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)[tehLinkColor CGColor], kCTForegroundColorAttributeName, nil];
 			}else{
-				break;
+				attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)bodyFontBold, kCTFontAttributeName, (__bridge id)[textColorBold CGColor], kCTForegroundColorAttributeName, nil];
 			}
+			CFAttributedStringSetAttributes(attrString, CFRangeMake(matchRange.location, matchRange.length), (__bridge CFDictionaryRef)attributes, NO);
+		}];
+	}
+	
+	NSRange range = [self.cleanText rangeOfCharacterFromSet:emojiCharacterSet options:NSLiteralSearch range:NSMakeRange(0, self.cleanText.length)];
+	CFStringRef nameRef = CTFontCopyName(bodyFont, kCTFontFullNameKey);
+	CGFloat fontSize = round(CTFontGetSize(bodyFont) * 0.8);
+	CTFontRef emojiFont = CTFontCreateWithName(nameRef, fontSize, NULL);
+	CFRelease(nameRef);
+	while(range.location != NSNotFound){
+		NSString *substring = [self.cleanText substringWithRange:range];
+		if([substring rangeOfCharacterFromSet:alphaNumericCharacterSet options:NSLiteralSearch range:NSMakeRange(0, substring.length)].location == NSNotFound){
+			//			NSLog(@"EMOJIII: %@", substring);
+			NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)emojiFont, kCTFontAttributeName, nil];
+			CFRange emojiRange = CFRangeMake(range.location, range.length); 
+			CFAttributedStringSetAttributes(attrString, emojiRange, (__bridge CFDictionaryRef)attributes, NO);
 		}
+		
+		CGFloat location = range.location + range.length;
+		range = [self.cleanText rangeOfCharacterFromSet:emojiCharacterSet options:NSLiteralSearch range:NSMakeRange(location, self.cleanText.length-location)];
 	}
 	
 	//create paragraph style and assign text alignment to it
 	int numParagraphSpecifiers = 3;
-	maxLineHeight = lineHeight;
-	CGFloat minLineHeight = lineHeight;
 	CTParagraphStyleSetting _settings[] = { 
 		{kCTParagraphStyleSpecifierAlignment, sizeof(ctTextAlignment), &ctTextAlignment},
-		{kCTParagraphStyleSpecifierMaximumLineHeight, sizeof(CGFloat), &maxLineHeight},
-		{kCTParagraphStyleSpecifierMinimumLineHeight, sizeof(CGFloat), &minLineHeight},
+		{kCTParagraphStyleSpecifierMaximumLineHeight, sizeof(CGFloat), &lineHeight},
+		{kCTParagraphStyleSpecifierMinimumLineHeight, sizeof(CGFloat), &lineHeight},
 		{kCTParagraphStyleSpecifierCount, sizeof(int), &numParagraphSpecifiers}
 	};
 	CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(_settings, sizeof(_settings) / sizeof(_settings[0]));
@@ -372,7 +414,7 @@ static NSRegularExpression *twitterNameEndRegEx;
 	}
 }
 - (void)drawTextInRect:(CGRect)rect{
-//	NSLog(@"drawRect: %@ - %@", NSStringFromCGRect(rect), text);
+	//	NSLog(@"drawRect: %@ - %@", NSStringFromCGRect(rect), text);
 	
 	CGContextRef context = UIGraphicsGetCurrentContext();
 	CGContextClearRect(context, rect);
@@ -380,24 +422,26 @@ static NSRegularExpression *twitterNameEndRegEx;
 		CGContextSetFillColorWithColor(context, backgroundCGColor);
 		CGContextFillRect(context, rect);
 	}
-
+	
 	if(!self.text || self.text.length == 0){
 		return;
 	}
 	CGSize fullSize = [self sizeThatFits:CGSizeMake(rect.size.width, 1000.0)];
 	
-//	NSLog(@"taco - %f > %d", fullSize.height /  self.lineHeight, self.numberOfLines);
+	//	NSLog(@"taco - %f > %d", fullSize.height /  self.lineHeight, self.numberOfLines);
 	if(self.numberOfLines && self.lineHeight && fullSize.height / self.lineHeight > self.numberOfLines){
 		shouldTruncate = YES;
 	}	
-
+	
 	if(!attrString){
 		[self createAttributedString];
 	}
-	if(YES && numberOfLines > 0 && shouldTruncate){
+	//	if(YES && numberOfLines > 0 && shouldTruncate){
+	if(YES){
 		// don't set any line break modes, etc, just let the frame draw as many full lines as will fit 
 		CGRect frameRect = rect;
 		CGMutablePathRef framePath = CGPathCreateMutable(); 
+		//		CGPathAddRect(framePath, NULL, frameRect); 
 		
 		CGContextSetTextMatrix(context, CGAffineTransformIdentity);
 		CGContextTranslateCTM(context, 0.0, self.bounds.size.height);
@@ -408,19 +452,21 @@ static NSRegularExpression *twitterNameEndRegEx;
 		reverseT = CGAffineTransformTranslate(reverseT, 0.0, -self.bounds.size.height);
 		
 		CGPathAddRect(framePath, NULL, CGRectApplyAffineTransform(frameRect, reverseT));
-
 		
-		CTFrameRef aFrame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, CFAttributedStringGetLength(attrString)), framePath, NULL); 
-		CFArrayRef lines = CTFrameGetLines(aFrame); 
+		if(ctFrame){
+			CFRelease(ctFrame);
+		}
+		ctFrame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, CFAttributedStringGetLength(attrString)), framePath, NULL); 
+		CFArrayRef lines = CTFrameGetLines(ctFrame); 
 		CFIndex count = CFArrayGetCount(lines);
 		if(count == 0){
 			CGPathRelease(framePath);
-			CFRelease(aFrame);
+			CFRelease(ctFrame);
 			return;
 		}
 		CGPoint origins[count];//the origins of each line at the baseline
 		CFRange range = CFRangeMake(0, count);
-		CTFrameGetLineOrigins(aFrame, range, origins); 
+		CTFrameGetLineOrigins(ctFrame, range, origins); 
 		// note that we only enumerate to count-1 in here-- we draw the last line separately 
 		for (CFIndex i = 0; i < count-1; i++) 
 		{ 
@@ -460,8 +506,7 @@ static NSRegularExpression *twitterNameEndRegEx;
 		CTLineDraw(truncated, context); 
 		CFRelease(truncated);
 		CGPathRelease(framePath);
-		CFRelease(aFrame);
-
+		
 	}else{
 		
 		CGRect topRect = self.frame;
@@ -486,8 +531,128 @@ static NSRegularExpression *twitterNameEndRegEx;
 		
 		CGAffineTransform ctm = CGContextGetCTM(context);
 		CGContextConcatCTM(context, CGAffineTransformInvert(ctm));
-
+		
 	}	
+	if(!pressRecog){
+		pressRecog = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(didPress:)];
+		pressRecog.minimumPressDuration = 0.05;
+		pressRecog.delaysTouchesBegan = YES;
+		pressRecog.delaysTouchesEnded = YES;
+		pressRecog.cancelsTouchesInView = YES;
+		pressRecog.delegate = self;
+		//		pressRecog.allowableMovement = 5; //pixels.. default=10
+		[self addGestureRecognizer:pressRecog];
+		//		if([self.delegate respondsToSelector:@selector(customLabel:didAddGestureRecog:)]){
+		//			[self.delegate customLabel:self didAddGestureRecog:pressRecog];
+		//		}
+	}
+}
+
+-(CGFloat)stringIndexAtLocation:(CGPoint)location{
+	CFArrayRef lines = CTFrameGetLines(ctFrame); 
+	CFIndex numLines = CFArrayGetCount(lines);
+	CGPoint origins[numLines];//the origins of each line at the baseline
+	CFRange range = CFRangeMake(0, numLines);
+	CTFrameGetLineOrigins(ctFrame, range, origins); 
+	for (CFIndex i = 0; i < numLines; i++){
+		CGPoint origin = origins[i];
+		if(location.y >= origin.y && location.y < origin.y + lineHeight){
+			CFIndex lineIndex = numLines-i-1;
+			CTLineRef line = (CTLineRef)CFArrayGetValueAtIndex(lines, lineIndex); 
+			CFIndex stringIndex = CTLineGetStringIndexForPosition(line, CGPointMake(location.x, 0));
+			//			NSLog(@"stringIndex = %ld", stringIndex);
+			return stringIndex;
+		}
+	}
+	return -1;
+}
+-(void)performActionOnHighlightedText{
+	if([self.delegate respondsToSelector:@selector(customLabel:didSelectText:type:)]){
+		[self.delegate customLabel:self didSelectText:highlightedText type:highlightedTextType];
+	}
+}
+-(BOOL)hasHighlightedText{
+	return highlightedTextIndex != NSNotFound;
+}
+-(void)resetHighlightedText{
+	highlightedTextIndex = NSNotFound;
+	highlightedText = nil;
+	highlightedTextType = kNMTextTypeNone;
+	[self createAttributedString];
+	[self setNeedsDisplay];
+}
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)recog shouldReceiveTouch:(UITouch *)touch{
+	//	NSLog(@"shouldReceiveTouch: %@", touch);
+	CGPoint location = [touch locationInView:self];
+	highlightedTextIndex = [self stringIndexAtLocation:location];
+	[self createAttributedString];
+	return highlightedText != nil;
+}
+
+-(void)didPress:(UILongPressGestureRecognizer *)recog{
+	CGPoint location = [recog locationInView:self];
+	//	NSLog(@"didPress: touch= %@ , bounds = %@ - state = %d", NSStringFromCGPoint(location), NSStringFromCGRect(self.bounds), recog.state);
+	
+	if(!CGRectContainsPoint(self.bounds, location)){
+		recogOutOfBounds = YES;
+	}
+	
+	switch (recog.state) {
+		case UIGestureRecognizerStateBegan:
+			recogOutOfBounds = NO; //reset.
+			if(highlightedTextIndex == NSNotFound){
+				highlightedTextIndex = [self stringIndexAtLocation:location];
+				[self createAttributedString];
+			}
+			if(highlightedText){
+				if([self.delegate respondsToSelector:@selector(customLabelDidBeginTouch:recog:)]){
+					[self.delegate customLabelDidBeginTouch:self recog:recog];
+				}
+			}else{
+				if([self.delegate respondsToSelector:@selector(customLabelDidBeginTouchOutsideOfHighlightedText:recog:)]){
+					[self.delegate customLabelDidBeginTouchOutsideOfHighlightedText:self recog:recog];
+				}
+			}
+			[self setNeedsDisplay];
+			break;
+			
+		case UIGestureRecognizerStateChanged:
+			if([self.delegate respondsToSelector:@selector(customLabel:didChange:)]){
+				[self.delegate customLabel:self didChange:recog];
+			}
+			if(recogOutOfBounds){
+				//				recog.enabled = NO;
+				//				recog.enabled = YES;
+				[self resetHighlightedText];
+				if([self.delegate respondsToSelector:@selector(customLabelDidEndTouchOutsideOfHighlightedText:recog:)]){
+					[self.delegate customLabelDidEndTouchOutsideOfHighlightedText:self recog:recog];
+				}
+			}
+			break;
+			
+		case UIGestureRecognizerStateEnded:
+			if(highlightedText && !recogOutOfBounds){
+				[self performActionOnHighlightedText];
+			}
+			//no break;
+		case UIGestureRecognizerStateCancelled:
+		case UIGestureRecognizerStateFailed:
+			if(highlightedText && !recogOutOfBounds){
+				if([self.delegate respondsToSelector:@selector(customLabelDidEndTouch:recog:)]){
+					[self.delegate customLabelDidEndTouch:self recog:recog];
+				}
+			}else{
+				if([self.delegate respondsToSelector:@selector(customLabelDidEndTouchOutsideOfHighlightedText:recog:)]){
+					[self.delegate customLabelDidEndTouchOutsideOfHighlightedText:self recog:recog];
+				}
+			}
+			[self resetHighlightedText];
+			
+			break;
+			
+		default:
+			break;
+	}
 }
 
 
