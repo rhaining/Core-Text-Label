@@ -22,6 +22,7 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreText/CoreText.h>
+#import "NMCustomLabelStyle.h"
 
 typedef enum{
 	kNMTextTypeNone=0,
@@ -50,19 +51,11 @@ typedef enum{
 
 
 @interface NMCustomLabel : UILabel <UIGestureRecognizerDelegate> {
-	NSString *cleanText;
-	CTTextAlignment ctTextAlignment;
-	CGFloat lineHeight;
-	
 	CTFramesetterRef framesetter;
 	CTFrameRef ctFrame;
 	CFMutableAttributedStringRef attrString;
 	
 	BOOL shouldTruncate;
-	
-	CTFontRef bodyFont;
-	CTFontRef bodyFontBold;
-	CTFontRef bodyFontItalic;
 	
 	CGColorRef backgroundCGColor;
 	
@@ -71,13 +64,12 @@ typedef enum{
 	CGFloat highlightedTextIndex;
 	NSString *highlightedText;
 	kNMTextType highlightedTextType;
+	
+	NSMutableDictionary *styles;
 }
 
 @property (nonatomic, readonly) NSString *cleanText;
-@property (nonatomic, strong) UIFont *fontBold;
-@property (nonatomic, strong) UIFont *fontItalic;
 @property (nonatomic) CTTextAlignment ctTextAlignment;
-@property (nonatomic, strong) UIColor *textColorBold;
 @property (nonatomic, strong) UIColor *linkColor;
 @property (nonatomic, strong) UIColor *activeLinkColor;
 @property (nonatomic) CGFloat lineHeight;
@@ -90,5 +82,9 @@ typedef enum{
 -(BOOL)hasHighlightedText;
 +(NSRegularExpression *)usernameRegEx;
 +(NSRegularExpression *)hashtagRegEx;
+
+-(void)setDefaultStyle:(NMCustomLabelStyle *)style;
+-(void)setStyle:(NMCustomLabelStyle *)style forKey:(NSString *)key;
+
 
 @end

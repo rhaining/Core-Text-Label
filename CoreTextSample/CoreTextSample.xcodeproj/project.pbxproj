@@ -23,6 +23,9 @@
 		D4799274151D21E0007C2898 /* logo-74.png in Resources */ = {isa = PBXBuildFile; fileRef = D4799270151D21E0007C2898 /* logo-74.png */; };
 		D4799275151D21E0007C2898 /* logo-114.png in Resources */ = {isa = PBXBuildFile; fileRef = D4799271151D21E0007C2898 /* logo-114.png */; };
 		D4799276151D21E0007C2898 /* logo-150.png in Resources */ = {isa = PBXBuildFile; fileRef = D4799272151D21E0007C2898 /* logo-150.png */; };
+		D48558FB15CC7A7700A1E9D5 /* NMCustomLabelStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = D48558FA15CC7A7700A1E9D5 /* NMCustomLabelStyle.m */; };
+		D485590315CC7DC500A1E9D5 /* fez.png in Resources */ = {isa = PBXBuildFile; fileRef = D485590115CC7DC500A1E9D5 /* fez.png */; };
+		D485590415CC7DC500A1E9D5 /* fez@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D485590215CC7DC500A1E9D5 /* fez@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +51,10 @@
 		D4799270151D21E0007C2898 /* logo-74.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "logo-74.png"; sourceTree = "<group>"; };
 		D4799271151D21E0007C2898 /* logo-114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "logo-114.png"; sourceTree = "<group>"; };
 		D4799272151D21E0007C2898 /* logo-150.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "logo-150.png"; sourceTree = "<group>"; };
+		D48558F915CC7A7700A1E9D5 /* NMCustomLabelStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NMCustomLabelStyle.h; path = ../../src/NMCustomLabelStyle.h; sourceTree = "<group>"; };
+		D48558FA15CC7A7700A1E9D5 /* NMCustomLabelStyle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NMCustomLabelStyle.m; path = ../../src/NMCustomLabelStyle.m; sourceTree = "<group>"; };
+		D485590115CC7DC500A1E9D5 /* fez.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fez.png; sourceTree = "<group>"; };
+		D485590215CC7DC500A1E9D5 /* fez@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "fez@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +127,8 @@
 				D4799270151D21E0007C2898 /* logo-74.png */,
 				D4799271151D21E0007C2898 /* logo-114.png */,
 				D4799272151D21E0007C2898 /* logo-150.png */,
+				D485590115CC7DC500A1E9D5 /* fez.png */,
+				D485590215CC7DC500A1E9D5 /* fez@2x.png */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -129,6 +138,8 @@
 			children = (
 				D4111A44151A81EA00EF6CC0 /* NMCustomLabel.h */,
 				D4111A45151A81EA00EF6CC0 /* NMCustomLabel.m */,
+				D48558F915CC7A7700A1E9D5 /* NMCustomLabelStyle.h */,
+				D48558FA15CC7A7700A1E9D5 /* NMCustomLabelStyle.m */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -193,6 +204,8 @@
 				D4799274151D21E0007C2898 /* logo-74.png in Resources */,
 				D4799275151D21E0007C2898 /* logo-114.png in Resources */,
 				D4799276151D21E0007C2898 /* logo-150.png in Resources */,
+				D485590315CC7DC500A1E9D5 /* fez.png in Resources */,
+				D485590415CC7DC500A1E9D5 /* fez@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,6 +220,7 @@
 				D4111A2F151A7FEB00EF6CC0 /* NMAppDelegate.m in Sources */,
 				D4111A38151A7FEB00EF6CC0 /* NMViewController.m in Sources */,
 				D4111A46151A81EA00EF6CC0 /* NMCustomLabel.m in Sources */,
+				D48558FB15CC7A7700A1E9D5 /* NMCustomLabelStyle.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

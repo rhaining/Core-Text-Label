@@ -21,21 +21,28 @@
 
 #import "NMCustomLabel.h"
 
-@interface NMCustomLabel(Private)
--(void)createAttributedString;
-@end
+static NSString *kNMImageInfoAttributeName = @"kNMImageInfoAttributeName";
+static NSString *kNMImageAttributeName = @"kNMImageAttributeName";
+static NSString *kNMImageVerticalOffsetAttributeName = @"kNMImageVerticalOffsetAttributeName";
 
 static NSRegularExpression *usernameRegEx;
 static NSRegularExpression *usernameEndRegEx;
 static NSRegularExpression *hashtagRegEx;
 static NSRegularExpression *tagRegEx;
-static NSRegularExpression *markupTagRegEx;
+//static NSRegularExpression *markupTagRegEx;
+static NSRegularExpression *spanTagRegEx;
 static NSCharacterSet *emojiCharacterSet;
 static NSCharacterSet *alphaNumericCharacterSet;
 
+@interface NMCustomLabel(Private)
+-(void)createAttributedString;
+@property (nonatomic, strong) NSMutableDictionary *styles;
+@end
+
 @implementation NMCustomLabel
 
-@synthesize  cleanText, ctTextAlignment, textColorBold, linkColor, activeLinkColor, lineHeight, numberOfLines, shouldBoldAtNames, kern, delegate;
+//, textColorBold
+@synthesize  cleanText, ctTextAlignment, linkColor, activeLinkColor, lineHeight, numberOfLines, shouldBoldAtNames, kern, delegate;
 @synthesize shouldLinkTypes;
 
 +(NSRegularExpression *)usernameRegEx{
@@ -73,11 +80,18 @@ static NSCharacterSet *alphaNumericCharacterSet;
 			NSLog(@"error creating regex: %@", error);
 		}
 	}
-	if(!markupTagRegEx){
+//	if(!markupTagRegEx){
+//		NSError *error = NULL;
+//		markupTagRegEx = [NSRegularExpression regularExpressionWithPattern:@"<([bi])>.+?</[bi]>" options:NSRegularExpressionCaseInsensitive error:&error];
+//		if(!markupTagRegEx){
+//			NSLog(@"error creating markupTagRegEx: %@", error);
+//		}
+//	}
+	if(!spanTagRegEx){
 		NSError *error = NULL;
-		markupTagRegEx = [NSRegularExpression regularExpressionWithPattern:@"<([bi])>.+?</[bi]>" options:NSRegularExpressionCaseInsensitive error:&error];
-		if(!markupTagRegEx){
-			NSLog(@"error creating markupTagRegEx: %@", error);
+		spanTagRegEx = [NSRegularExpression regularExpressionWithPattern:@"<span (.+?)>.+?</span>" options:NSRegularExpressionCaseInsensitive error:&error];
+		if(!spanTagRegEx){
+			NSLog(@"error creating spanTagRegEx: %@", error);
 		}
 	}
 	if(!emojiCharacterSet){
@@ -86,21 +100,15 @@ static NSCharacterSet *alphaNumericCharacterSet;
 		alphaNumericCharacterSet = [NSCharacterSet alphanumericCharacterSet];
 	}
 }
--(void)setDefaults{
-	self.backgroundColor = [UIColor whiteColor];
-	
-	[self setFont:[UIFont fontWithName:@"HelveticaNeue" size:12]];
-	[self setFontBold:[UIFont fontWithName:@"HelveticaNeue-Bold" size:12]];
-	//	[self setFontItalic:[UIFont fontWithName:@"HelveticaNeue-LightItalic" size:12]];
-	
-	self.textColor = [UIColor blackColor];
-	self.textColorBold = [UIColor blackColor];
-	
-	highlightedTextIndex = NSNotFound;
-}
 -(void)setShouldLinkTypes:(kNMShouldLink)_shouldLinkTypes{
 	shouldLinkTypes = _shouldLinkTypes;
 	self.userInteractionEnabled = YES;
+}
+-(void)setDefaults{
+	self.backgroundColor = [UIColor whiteColor];		
+	[self setDefaultStyle:[NMCustomLabelStyle new]];
+	
+	highlightedTextIndex = NSNotFound;
 }
 -(UIColor *)backgroundColor{
 	if(backgroundCGColor){
@@ -119,6 +127,33 @@ static NSCharacterSet *alphaNumericCharacterSet;
 	}
 	[self setNeedsDisplay];
 }
+-(UITextAlignment)textAlignment{
+	switch (ctTextAlignment) {
+		case kCTLeftTextAlignment:
+			return UITextAlignmentLeft;
+		case kCTRightTextAlignment:
+			return UITextAlignmentRight;
+		case kCTCenterTextAlignment:
+			return UITextAlignmentCenter;
+	}
+	return UITextAlignmentLeft;
+}
+-(void)setTextAlignment:(UITextAlignment)textAlignment{
+	switch (textAlignment) {
+		case UITextAlignmentLeft:
+			ctTextAlignment = kCTLeftTextAlignment;
+			break;
+		case UITextAlignmentCenter:
+			ctTextAlignment = kCTCenterTextAlignment;
+			break;
+		case UITextAlignmentRight:
+			ctTextAlignment = kCTRightTextAlignment;
+			break;
+		default:
+			ctTextAlignment = kCTLeftTextAlignment;
+			break;
+	}
+}
 -(id)initWithFrame:(CGRect)frame{
 	if(self = [super initWithFrame:frame]){
 		[self setDefaults];
@@ -134,9 +169,6 @@ static NSCharacterSet *alphaNumericCharacterSet;
 -(void)dealloc{
 	if(attrString){ CFRelease(attrString); }
 	if(framesetter){ CFRelease(framesetter); }
-	if(bodyFont){ CFRelease(bodyFont); }
-	if(bodyFontItalic){ CFRelease(bodyFontItalic); }
-	if(bodyFontBold){ CFRelease(bodyFontBold); }
 	if(backgroundCGColor){ CGColorRelease(backgroundCGColor); }
 	if(ctFrame){ CFRelease(ctFrame); }
 }
@@ -153,24 +185,6 @@ static NSCharacterSet *alphaNumericCharacterSet;
 	}else{
 		return nil;
 	}
-}
--(UIFont *)font{ return [self uiFontWithCTFont:bodyFont]; }
--(UIFont *)fontBold{ return [self uiFontWithCTFont:bodyFontBold]; }
--(UIFont *)fontItalic{ return [self uiFontWithCTFont:bodyFontItalic]; }
-
--(void)setFont:(UIFont *)font{
-	if(bodyFont){ CFRelease(bodyFont); }
-	bodyFont = [self newCTFontWithUIFont:font];
-}
--(void)setFontBold:(UIFont *)fontBold{
-	if(bodyFontBold){
-		CFRelease(bodyFontBold);
-	}
-	bodyFontBold = [self newCTFontWithUIFont:fontBold];
-}
--(void)setFontItalic:(UIFont *)font{
-	if(bodyFontItalic){ CFRelease(bodyFontItalic); }
-	bodyFontItalic = [self newCTFontWithUIFont:font];
 }
 -(void)clearAttrString{
 	if(attrString){
@@ -213,19 +227,25 @@ static NSCharacterSet *alphaNumericCharacterSet;
 		[self setNeedsDisplay];
 	}
 }
--(void)setTextColor:(UIColor *)_textColor{
-	if([self.textColor isEqual:_textColor]){
-		return;
+
+-(NSMutableDictionary *)styles{
+	if(!styles){
+		styles = [NSMutableDictionary dictionaryWithCapacity:5];
 	}
-	[super setTextColor:_textColor];
-	[self didUpdateColor];
+	return styles;
 }
--(void)setTextColorBold:(UIColor *)_textColorBold{
-	if([textColorBold isEqual:_textColorBold]){
-		return;
+-(void)setStyle:(NMCustomLabelStyle *)style forKey:(NSString *)key{
+	[self.styles setObject:style forKey:[key lowercaseString]];
+}
+-(void)setDefaultStyle:(NMCustomLabelStyle *)style{
+	[self setStyle:style forKey:NMCustomLabelStyleDefaultKey];
+}
+-(NMCustomLabelStyle *)defaultStyle{
+	if([self.styles objectForKey:NMCustomLabelStyleDefaultKey]){
+		return [self.styles objectForKey:NMCustomLabelStyleDefaultKey];
+	}else{
+		return [NMCustomLabelStyle new];
 	}
-	textColorBold = _textColorBold;
-	[self didUpdateColor];
 }
 -(void)setLinkColor:(UIColor *)color{
 	if([linkColor isEqual:color]){
@@ -246,23 +266,25 @@ static NSCharacterSet *alphaNumericCharacterSet;
 		//no text. return.
 		return; 
 	}
-	//	NSLog(@"customlabel - create - %@", text);
+//	NSLog(@"customlabel - create - %@", text);
 	
 	[self clearAttrString];
 	attrString = CFAttributedStringCreateMutable(kCFAllocatorDefault, 0);
 	
 	CFAttributedStringReplaceString (attrString, CFRangeMake(0, 0), (__bridge CFStringRef)cleanText);
 	
+	NMCustomLabelStyle *defaultStyle = [self defaultStyle];
+
 	//set default color
-	CFAttributedStringSetAttribute(attrString, CFRangeMake(0, CFAttributedStringGetLength(attrString)), kCTForegroundColorAttributeName, [self.textColor CGColor]);
+	CFAttributedStringSetAttribute(attrString, CFRangeMake(0, CFAttributedStringGetLength(attrString)), kCTForegroundColorAttributeName, defaultStyle.colorRef);
 	
 	//set default font
-	CFAttributedStringSetAttribute(attrString, CFRangeMake(0, CFAttributedStringGetLength(attrString)), kCTFontAttributeName, bodyFont);
+	CFAttributedStringSetAttribute(attrString, CFRangeMake(0, CFAttributedStringGetLength(attrString)), kCTFontAttributeName, defaultStyle.fontRef);
 	
 	__block int locOfTag = -1;
 	__block int totalTagLength = 0;
-	static int eachTagLength = 7;
-	
+//	static int eachTagLength = 7;
+/*	
 	[markupTagRegEx enumerateMatchesInString:self.text options:0 range:NSMakeRange(0, [self.text length]) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop){
 		
 		NSRange markupRange = [match range];
@@ -289,13 +311,61 @@ static NSCharacterSet *alphaNumericCharacterSet;
 			CFAttributedStringSetAttributes(attrString, CFRangeMake(markupRange.location, markupRange.length), (__bridge CFDictionaryRef)attributes, NO);
 		}
 	}];
+ */
+	[spanTagRegEx enumerateMatchesInString:self.text options:0 range:NSMakeRange(0, [self.text length]) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop){
+		int thisTagLength = 14;
 	
+		CTFontRef font=nil;
+		CGColorRef color=nil;
+		UIImage *image=nil;
+		CGFloat imageVerticalOffset=0;
+		if(match.numberOfRanges > 1){
+			NSRange tagTypeRange = [match rangeAtIndex:1];
+			thisTagLength += tagTypeRange.length;
+			NSString *tagInfo = [[self.text substringWithRange:tagTypeRange] lowercaseString];
+			tagInfo = [tagInfo stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+			NSArray *metadata = [tagInfo componentsSeparatedByString:@"="];
+			if(metadata.count == 2 && [[metadata objectAtIndex:0] isEqualToString:@"class"]){
+				NSString *styleKey = [metadata objectAtIndex:1];
+				styleKey = [styleKey stringByTrimmingCharactersInSet:[NSCharacterSet punctuationCharacterSet]];
+				NMCustomLabelStyle *style = [self.styles objectForKey:styleKey];
+				if(style){
+					font = style.fontRef;
+					color = style.colorRef;
+					image = style.image;
+					imageVerticalOffset = style.imageVerticalOffset;
+				}
+			}
+		}
+		
+		NSRange markupRange = [match range];
+		markupRange.length -= thisTagLength;
+		markupRange.location -= totalTagLength;
+		locOfTag = markupRange.location + markupRange.length;
+		totalTagLength += thisTagLength;
+		
+		if(font && color){
+			NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)font, kCTFontAttributeName, color, kCTForegroundColorAttributeName, nil];
+			CFAttributedStringSetAttributes(attrString, CFRangeMake(markupRange.location, markupRange.length), (__bridge CFDictionaryRef)attributes, NO);
+		}
+		if(image){
+			NSDictionary *imageAttr = [NSDictionary dictionaryWithObjectsAndKeys:image, kNMImageAttributeName, [NSNumber numberWithFloat:imageVerticalOffset], kNMImageVerticalOffsetAttributeName, nil];
+			NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:imageAttr, kNMImageInfoAttributeName, nil];
+			CFAttributedStringSetAttributes(attrString, CFRangeMake(markupRange.location, markupRange.length), (__bridge CFDictionaryRef)attributes, NO);			
+		}
+
+	}];
+
 	if(self.shouldBoldAtNames && (self.shouldLinkTypes & kNMShouldLinkUsernames) ){
 		[usernameRegEx enumerateMatchesInString:self.text options:0 range:NSMakeRange(0, [self.text length]) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop){
 			
 			if(match.numberOfRanges > 1){
 				NSRange range = [match rangeAtIndex:1];
-				if(range.length > 1){ //aka not just an '@' symbol					
+				if(range.length > 1){ //aka not just an '@' symbol
+//					if(locOfTag >= 0 && locOfTag < boldRange.location){
+//						boldRange.location -= totalTagLength;
+//					}
+					
 					NSDictionary *attributes;
 					if(linkColor){
 						UIColor *tehLinkColor = linkColor;
@@ -308,7 +378,8 @@ static NSCharacterSet *alphaNumericCharacterSet;
 						}
 						attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)[tehLinkColor CGColor], kCTForegroundColorAttributeName, nil];
 					}else{
-						attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)bodyFontBold, kCTFontAttributeName, (__bridge id)[textColorBold CGColor], kCTForegroundColorAttributeName, nil];
+						NMCustomLabelStyle *boldStyle = [self.styles objectForKey:NMCustomLabelStyleBoldKey];
+						attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)boldStyle.fontRef, kCTFontAttributeName, (__bridge id)[boldStyle colorRef], kCTForegroundColorAttributeName, nil];
 					}
 					CFAttributedStringSetAttributes(attrString, CFRangeMake(range.location, range.length), (__bridge CFDictionaryRef)attributes, NO);
 				}
@@ -334,24 +405,30 @@ static NSCharacterSet *alphaNumericCharacterSet;
 				}
 				attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)[tehLinkColor CGColor], kCTForegroundColorAttributeName, nil];
 			}else{
-				attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)bodyFontBold, kCTFontAttributeName, (__bridge id)[textColorBold CGColor], kCTForegroundColorAttributeName, nil];
+				NMCustomLabelStyle *boldStyle = [self.styles objectForKey:NMCustomLabelStyleBoldKey];
+				attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)boldStyle.fontRef, kCTFontAttributeName, (__bridge id)[boldStyle colorRef], kCTForegroundColorAttributeName, nil];
 			}
 			CFAttributedStringSetAttributes(attrString, CFRangeMake(matchRange.location, matchRange.length), (__bridge CFDictionaryRef)attributes, NO);
 		}];
 	}
-	
+		
 	NSRange range = [self.cleanText rangeOfCharacterFromSet:emojiCharacterSet options:NSLiteralSearch range:NSMakeRange(0, self.cleanText.length)];
-	CFStringRef nameRef = CTFontCopyName(bodyFont, kCTFontFullNameKey);
-	CGFloat fontSize = round(CTFontGetSize(bodyFont) * 0.8);
-	CTFontRef emojiFont = CTFontCreateWithName(nameRef, fontSize, NULL);
-	CFRelease(nameRef);
 	while(range.location != NSNotFound){
 		NSString *substring = [self.cleanText substringWithRange:range];
 		if([substring rangeOfCharacterFromSet:alphaNumericCharacterSet options:NSLiteralSearch range:NSMakeRange(0, substring.length)].location == NSNotFound){
-			//			NSLog(@"EMOJIII: %@", substring);
-			NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)emojiFont, kCTFontAttributeName, nil];
+//			NSLog(@"EMOJIII: %@", substring);
+			
+			CFDictionaryRef currentAttributes = CFAttributedStringGetAttributes(attrString, range.location, NULL);
+			CTFontRef currentFont = CFDictionaryGetValue(currentAttributes, @"NSFont");
+			CFStringRef currentFontName = CTFontCopyFullName(currentFont);
+			CTFontRef smallerFont = CTFontCreateWithName(currentFontName, CTFontGetSize(currentFont) * 0.8, NULL);
+			
+			NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)smallerFont, kCTFontAttributeName, nil];
 			CFRange emojiRange = CFRangeMake(range.location, range.length); 
 			CFAttributedStringSetAttributes(attrString, emojiRange, (__bridge CFDictionaryRef)attributes, NO);
+			
+			CFRelease(currentFontName);
+			CFRelease(smallerFont);
 		}
 		
 		CGFloat location = range.location + range.length;
@@ -364,6 +441,7 @@ static NSCharacterSet *alphaNumericCharacterSet;
 		{kCTParagraphStyleSpecifierAlignment, sizeof(ctTextAlignment), &ctTextAlignment},
 		{kCTParagraphStyleSpecifierMaximumLineHeight, sizeof(CGFloat), &lineHeight},
 		{kCTParagraphStyleSpecifierMinimumLineHeight, sizeof(CGFloat), &lineHeight},
+//		{kCTParagraphStyleSpecifierLineBreakMode, sizeof(CTLineBreakMode), &lineBreakMode},
 		{kCTParagraphStyleSpecifierCount, sizeof(int), &numParagraphSpecifiers}
 	};
 	CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(_settings, sizeof(_settings) / sizeof(_settings[0]));
@@ -402,9 +480,21 @@ static NSCharacterSet *alphaNumericCharacterSet;
 		//on iOS 4, we were getting heights of 14.9 where the line height was 15, so it was getting cut off.  after we stop supporting iOS 4, we could safely kill these lines.
 		suggestedSize.width = round(suggestedSize.width);
 		suggestedSize.height = round(suggestedSize.height);
+
+//		NSLog(@"NMCustomLabel-sizeThatFits: %@ %@ --> %@", cleanText, NSStringFromCGSize(size), NSStringFromCGSize(suggestedSize));
 	}else{
 		suggestedSize = size;
 	}
+//	if(NO){
+//		if(self.numberOfLines > 0 && self.lineHeight > 0){
+//			if(suggestedSize.height / self.lineHeight > self.numberOfLines){
+//				CGFloat oldheight = suggestedSize.height;
+//				suggestedSize.height = self.numberOfLines * self.lineHeight;
+//				NSLog(@"suggested height reduced from %f to %f", oldheight, suggestedSize.height);
+//				shouldTruncate = YES;
+//			}
+//		}
+//	}	
 	return suggestedSize;
 }
 -(void)setFrame:(CGRect)frame{
@@ -414,7 +504,7 @@ static NSCharacterSet *alphaNumericCharacterSet;
 	}
 }
 - (void)drawTextInRect:(CGRect)rect{
-	//	NSLog(@"drawRect: %@ - %@", NSStringFromCGRect(rect), text);
+//	NSLog(@"drawRect: %@ - %@", NSStringFromCGRect(rect), text);
 	
 	CGContextRef context = UIGraphicsGetCurrentContext();
 	CGContextClearRect(context, rect);
@@ -422,26 +512,26 @@ static NSCharacterSet *alphaNumericCharacterSet;
 		CGContextSetFillColorWithColor(context, backgroundCGColor);
 		CGContextFillRect(context, rect);
 	}
-	
+
 	if(!self.text || self.text.length == 0){
 		return;
 	}
 	CGSize fullSize = [self sizeThatFits:CGSizeMake(rect.size.width, 1000.0)];
 	
-	//	NSLog(@"taco - %f > %d", fullSize.height /  self.lineHeight, self.numberOfLines);
+//	NSLog(@"taco - %f > %d", fullSize.height /  self.lineHeight, self.numberOfLines);
 	if(self.numberOfLines && self.lineHeight && fullSize.height / self.lineHeight > self.numberOfLines){
 		shouldTruncate = YES;
 	}	
-	
+
 	if(!attrString){
 		[self createAttributedString];
 	}
-	//	if(YES && numberOfLines > 0 && shouldTruncate){
+//	if(YES && numberOfLines > 0 && shouldTruncate){
 	if(YES){
 		// don't set any line break modes, etc, just let the frame draw as many full lines as will fit 
 		CGRect frameRect = rect;
 		CGMutablePathRef framePath = CGPathCreateMutable(); 
-		//		CGPathAddRect(framePath, NULL, frameRect); 
+//		CGPathAddRect(framePath, NULL, frameRect); 
 		
 		CGContextSetTextMatrix(context, CGAffineTransformIdentity);
 		CGContextTranslateCTM(context, 0.0, self.bounds.size.height);
@@ -452,7 +542,7 @@ static NSCharacterSet *alphaNumericCharacterSet;
 		reverseT = CGAffineTransformTranslate(reverseT, 0.0, -self.bounds.size.height);
 		
 		CGPathAddRect(framePath, NULL, CGRectApplyAffineTransform(frameRect, reverseT));
-		
+
 		if(ctFrame){
 			CFRelease(ctFrame);
 		}
@@ -505,8 +595,11 @@ static NSCharacterSet *alphaNumericCharacterSet;
 		CGContextSetTextPosition(context, lastOrigin.x, lastOrigin.y); 
 		CTLineDraw(truncated, context); 
 		CFRelease(truncated);
-		CGPathRelease(framePath);
 		
+		[self drawImagesForFrame:ctFrame fromAttributedString:(__bridge NSAttributedString *)attrString];
+
+		CGPathRelease(framePath);
+
 	}else{
 		
 		CGRect topRect = self.frame;
@@ -531,7 +624,7 @@ static NSCharacterSet *alphaNumericCharacterSet;
 		
 		CGAffineTransform ctm = CGContextGetCTM(context);
 		CGContextConcatCTM(context, CGAffineTransformInvert(ctm));
-		
+
 	}	
 	if(!pressRecog){
 		pressRecog = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(didPress:)];
@@ -540,13 +633,57 @@ static NSCharacterSet *alphaNumericCharacterSet;
 		pressRecog.delaysTouchesEnded = YES;
 		pressRecog.cancelsTouchesInView = YES;
 		pressRecog.delegate = self;
-		//		pressRecog.allowableMovement = 5; //pixels.. default=10
+//		pressRecog.allowableMovement = 5; //pixels.. default=10
 		[self addGestureRecognizer:pressRecog];
-		//		if([self.delegate respondsToSelector:@selector(customLabel:didAddGestureRecog:)]){
-		//			[self.delegate customLabel:self didAddGestureRecog:pressRecog];
-		//		}
+//		if([self.delegate respondsToSelector:@selector(customLabel:didAddGestureRecog:)]){
+//			[self.delegate customLabel:self didAddGestureRecog:pressRecog];
+//		}
 	}
 }
+
+//borrowed from https://github.com/adamjernst/AEImageAttributedString/blob/master/AEImageAttributedString/AEImageAttributedString.m
+-(void)drawImagesForFrame:(CTFrameRef)frame fromAttributedString:(NSAttributedString *)string {
+    CGRect rect = CGPathGetBoundingBox(CTFrameGetPath(frame));
+	CFArrayRef lines = CTFrameGetLines(frame);
+	
+    CGContextRef c = UIGraphicsGetCurrentContext();
+    
+    [string enumerateAttribute:kNMImageInfoAttributeName inRange:NSMakeRange(0, [string length]) options:0 usingBlock:^(id value, NSRange range, BOOL *stop) {
+		NSDictionary *attributes = (NSDictionary *)value;
+		UIImage *image = [attributes objectForKey:kNMImageAttributeName];
+		CGFloat verticalOffset = [[attributes objectForKey:kNMImageVerticalOffsetAttributeName] floatValue];
+		
+		if(!image){
+			return;
+		}
+		
+		CGRect imageRect = {
+			.origin = rect.origin,
+			.size = image.size
+		};
+		
+		for (CFIndex i = 0; i < CFArrayGetCount(lines); i++) {
+			CTLineRef line = CFArrayGetValueAtIndex(lines, i);
+			CFRange r = CTLineGetStringRange(line);
+			int localIndex = range.location - r.location;
+			if (localIndex >= 0 && localIndex < r.length) {
+				imageRect.origin.x += CTLineGetOffsetForStringIndex(line, range.location, NULL);
+				CGPoint lineOrigin;
+				CTFrameGetLineOrigins(frame, CFRangeMake(i, 1), &lineOrigin);
+				imageRect.origin.x += lineOrigin.x;
+				imageRect.origin.y += lineOrigin.y - 2.0f;
+				break;
+			}
+		}
+		imageRect.origin.y += verticalOffset;
+		
+		CGContextDrawImage(c, imageRect, image.CGImage);
+	}];
+}
+
+
+
+
 
 -(CGFloat)stringIndexAtLocation:(CGPoint)location{
 	CFArrayRef lines = CTFrameGetLines(ctFrame); 
@@ -560,7 +697,7 @@ static NSCharacterSet *alphaNumericCharacterSet;
 			CFIndex lineIndex = numLines-i-1;
 			CTLineRef line = (CTLineRef)CFArrayGetValueAtIndex(lines, lineIndex); 
 			CFIndex stringIndex = CTLineGetStringIndexForPosition(line, CGPointMake(location.x, 0));
-			//			NSLog(@"stringIndex = %ld", stringIndex);
+//			NSLog(@"stringIndex = %ld", stringIndex);
 			return stringIndex;
 		}
 	}
@@ -582,7 +719,7 @@ static NSCharacterSet *alphaNumericCharacterSet;
 	[self setNeedsDisplay];
 }
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)recog shouldReceiveTouch:(UITouch *)touch{
-	//	NSLog(@"shouldReceiveTouch: %@", touch);
+//	NSLog(@"shouldReceiveTouch: %@", touch);
 	CGPoint location = [touch locationInView:self];
 	highlightedTextIndex = [self stringIndexAtLocation:location];
 	[self createAttributedString];
@@ -591,12 +728,12 @@ static NSCharacterSet *alphaNumericCharacterSet;
 
 -(void)didPress:(UILongPressGestureRecognizer *)recog{
 	CGPoint location = [recog locationInView:self];
-	//	NSLog(@"didPress: touch= %@ , bounds = %@ - state = %d", NSStringFromCGPoint(location), NSStringFromCGRect(self.bounds), recog.state);
+//	NSLog(@"didPress: touch= %@ , bounds = %@ - state = %d", NSStringFromCGPoint(location), NSStringFromCGRect(self.bounds), recog.state);
 	
 	if(!CGRectContainsPoint(self.bounds, location)){
 		recogOutOfBounds = YES;
 	}
-	
+
 	switch (recog.state) {
 		case UIGestureRecognizerStateBegan:
 			recogOutOfBounds = NO; //reset.
@@ -615,21 +752,21 @@ static NSCharacterSet *alphaNumericCharacterSet;
 			}
 			[self setNeedsDisplay];
 			break;
-			
+		
 		case UIGestureRecognizerStateChanged:
 			if([self.delegate respondsToSelector:@selector(customLabel:didChange:)]){
 				[self.delegate customLabel:self didChange:recog];
 			}
 			if(recogOutOfBounds){
-				//				recog.enabled = NO;
-				//				recog.enabled = YES;
+//				recog.enabled = NO;
+//				recog.enabled = YES;
 				[self resetHighlightedText];
 				if([self.delegate respondsToSelector:@selector(customLabelDidEndTouchOutsideOfHighlightedText:recog:)]){
 					[self.delegate customLabelDidEndTouchOutsideOfHighlightedText:self recog:recog];
 				}
 			}
 			break;
-			
+		
 		case UIGestureRecognizerStateEnded:
 			if(highlightedText && !recogOutOfBounds){
 				[self performActionOnHighlightedText];
@@ -647,7 +784,7 @@ static NSCharacterSet *alphaNumericCharacterSet;
 				}
 			}
 			[self resetHighlightedText];
-			
+
 			break;
 			
 		default:
