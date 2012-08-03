@@ -8,13 +8,11 @@ I built the sample project using iOS 5.1, but there's no reason it shouldn't wor
 ## As easy as pie
 ```
 	NMCustomLabel *label = [[NMCustomLabel alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
-	label.text = @"Tacos are <b>delicious</b>, <i>seriously</i>";
-	label.font = [UIFont fontWithName:@"HelveticaNeue" size:12];
-	label.fontBold = [UIFont fontWithName:@"HelveticaNeue-Bold" size:13];
-	label.fontItalic = [UIFont fontWithName:@"HelveticaNeue-LightItalic" size:12];
+	label.text = @"Tacos are <span class='bold_style'>delicious</span>, <span class='ital_style'>seriously</span>";
+	[label setDefaultStyle:[NMCustomLabelStyle styleWithFont:[UIFont fontWithName:@"HelveticaNeue" size:12] color:[UIColor colorWithRed:153/255.0 green:153/255.0 blue:153/255.0 alpha:1.0]]];
+	[label setStyle:[NMCustomLabelStyle styleWithFont:[UIFont fontWithName:@"HelveticaNeue-Bold" size:13] color:[UIColor colorWithRed:53/255.0 green:53/255.0 blue:53/255.0 alpha:1.0]] forKey:@"bold_style"];
+	[label setStyle:[NMCustomLabelStyle styleWithFont:[UIFont fontWithName:@"HelveticaNeue-LightItalic" size:12] color:[UIColor colorWithRed:153/255.0 green:153/255.0 blue:153/255.0 alpha:1.0]] forKey:@"ital_style"];	
 	label.kern = -0.5;
-	label.textColor = [UIColor colorWithRed:153/255.0 green:153/255.0 blue:153/255.0 alpha:1.0];
-	label.textColorBold = [UIColor colorWithRed:53/255.0 green:53/255.0 blue:53/255.0 alpha:1.0];
 	label.lineHeight = 12;
 	[self.view addSubview:label];
 ```
