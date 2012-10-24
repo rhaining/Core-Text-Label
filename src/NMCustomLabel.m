@@ -135,6 +135,8 @@ static NSCharacterSet *alphaNumericCharacterSet;
 			return UITextAlignmentRight;
 		case kCTCenterTextAlignment:
 			return UITextAlignmentCenter;
+        default:
+            return UITextAlignmentLeft;
 	}
 	return UITextAlignmentLeft;
 }
