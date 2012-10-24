@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C899EFBE163895E800702B89 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = C899EFBB163895E800702B89 /* Default.png */; };
+		C899EFBF163895E800702B89 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C899EFBC163895E800702B89 /* Default-568h@2x.png */; };
+		C899EFC0163895E800702B89 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C899EFBD163895E800702B89 /* Default@2x.png */; };
 		D4111A1F151A7FEB00EF6CC0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4111A1E151A7FEB00EF6CC0 /* UIKit.framework */; };
 		D4111A21151A7FEB00EF6CC0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4111A20151A7FEB00EF6CC0 /* Foundation.framework */; };
 		D4111A23151A7FEB00EF6CC0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4111A22151A7FEB00EF6CC0 /* CoreGraphics.framework */; };
@@ -29,6 +32,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C899EFBB163895E800702B89 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		C899EFBC163895E800702B89 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		C899EFBD163895E800702B89 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		D4111A1A151A7FEB00EF6CC0 /* CoreTextSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CoreTextSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4111A1E151A7FEB00EF6CC0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		D4111A20151A7FEB00EF6CC0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -129,6 +135,9 @@
 				D4799272151D21E0007C2898 /* logo-150.png */,
 				D485590115CC7DC500A1E9D5 /* fez.png */,
 				D485590215CC7DC500A1E9D5 /* fez@2x.png */,
+				C899EFBB163895E800702B89 /* Default.png */,
+				C899EFBC163895E800702B89 /* Default-568h@2x.png */,
+				C899EFBD163895E800702B89 /* Default@2x.png */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -206,6 +215,9 @@
 				D4799276151D21E0007C2898 /* logo-150.png in Resources */,
 				D485590315CC7DC500A1E9D5 /* fez.png in Resources */,
 				D485590415CC7DC500A1E9D5 /* fez@2x.png in Resources */,
+				C899EFBE163895E800702B89 /* Default.png in Resources */,
+				C899EFBF163895E800702B89 /* Default-568h@2x.png in Resources */,
+				C899EFC0163895E800702B89 /* Default@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
