@@ -6,7 +6,7 @@ Make sure to add the Core Text framework before adding the class to your project
 I built the sample project using iOS 5.1, but there's no reason it shouldn't work going back to iOS 3.2 I think [but I've only tested the class back to 4.3].
 
 ## As easy as pie
-```
+```objective-c
 	NMCustomLabel *label = [[NMCustomLabel alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
 	label.text = @"Tacos are <span class='bold_style'>delicious</span>, <span class='ital_style'>seriously</span>";
 	[label setDefaultStyle:[NMCustomLabelStyle styleWithFont:[UIFont fontWithName:@"HelveticaNeue" size:12] color:[UIColor colorWithRed:153/255.0 green:153/255.0 blue:153/255.0 alpha:1.0]]];
@@ -17,10 +17,10 @@ I built the sample project using iOS 5.1, but there's no reason it shouldn't wor
 	[self.view addSubview:label];
 ```
 
-## About News.me
-[News.me](http://News.me/) is a small team based out of [betaworks](http://betaworks.com/) in New York City. We build applications that improve the way people find and talk about the news.
+## About Digg
+[Digg](http://digg.com/) is a small team based out of [betaworks](http://betaworks.com/) in New York City. Digg delivers the most interesting and talked about stories on the Internet right now.
 
-We have an [iPhone app](http://news.me/iphone-download?source=about), an [iPad app](http://news.me/ipad-download?source=about), and a [daily email](http://www.news.me/#email-signup) that deliver the best stories shared by your friends on Twitter and Facebook.
+We have an [iOS app](http://digg.com/ios-download) & a [web app](http://digg.com/).
 
 ## About this project
 This class was introduced as a part Rob's talk at the [Brooklyn iOS Dev Meetup](http://www.meetup.com/The-Brooklyn-iPhone-and-iPad-Developer-Meetup/). See slides & more at [bit.ly/bkiosmeetup](http://bit.ly/bkiosmeetup).
