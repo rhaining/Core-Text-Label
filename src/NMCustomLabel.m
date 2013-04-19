@@ -391,7 +391,7 @@ static NSCharacterSet *alphaNumericCharacterSet;
 	
 	if(self.shouldLinkTypes & kNMShouldLinkURLs){
 		NSError *error = NULL;
-		NSDataDetector *detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:&error];
+		NSDataDetector *detector = [NSDataDetector dataDetectorWithTypes:(NSTextCheckingTypes)NSTextCheckingTypeLink error:&error];
 		[detector enumerateMatchesInString:self.cleanText options:0 range:NSMakeRange(0, [self.cleanText length]) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop){
 			
 			NSRange matchRange = [match range];
