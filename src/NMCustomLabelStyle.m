@@ -1,9 +1,7 @@
 //
 //  NMCustomLabelStyle.m
-//  Banana Stand
 //
-//  Created by Robert Haining on 6/18/12.
-//  Copyright (c) 2012 News.me. All rights reserved.
+//  Created by Robert Haining
 //
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,19 +19,32 @@
 //
 
 #import "NMCustomLabelStyle.h"
+#import "NMFont.h"
 
 NSString * const NMCustomLabelStyleDefaultKey = @"nm-default-style";
 NSString * const NMCustomLabelStyleBoldKey = @"nm-bold-style";
+NSString * const NMCustomLabelStyleItalicKey = @"nm-ital-style";
+NSString * const NMCustomLabelStyleMarkKey = @"nm-mark-style";
 
 @implementation NMCustomLabelStyle
 
-@synthesize fontName, fontSize, textColor, image, imageVerticalOffset;
-@synthesize fontRef, colorRef;
+-(id)copyWithZone:(NSZone *)zone{
+	NMCustomLabelStyle *style = [NMCustomLabelStyle new];
+	style.fontName = [self.fontName copyWithZone:zone];
+	style.fontSize = self.fontSize;
+	style.textColor = [self.textColor copyWithZone:zone];
+	style.image = self.image;
+	style.imageVerticalOffset = self.imageVerticalOffset;
+	style.backgroundColor = [self.backgroundColor copyWithZone:zone];
+	style.shadowOffset = self.shadowOffset;
+	style.shadowBlurRadius = self.shadowBlurRadius;
+	style.shadowColor = [self.shadowColor copyWithZone:zone];
+	return style;
+}
 
 +(id)styleWithFont:(UIFont *)font color:(UIColor *)color{
 	NMCustomLabelStyle *style = [NMCustomLabelStyle new];
-	style.fontName = font.fontName;
-	style.fontSize = font.pointSize;
+	[style setFont:font];
 	style.textColor = color;
 	return style;
 }
@@ -47,57 +58,55 @@ NSString * const NMCustomLabelStyleBoldKey = @"nm-bold-style";
 	return [self styleWithImage:image verticalOffset:0];
 }
 
--(void)dealloc{
-	[self resetFontRef];
-	[self resetTextColor];
-}
--(void)resetFontRef{
-	if(fontRef){
-		CFRelease(fontRef);
-		fontRef = nil;
-	}	
-}
--(void)resetTextColor{
-	if(colorRef){
-		CFRelease(colorRef);
-		colorRef = nil;
-	}	
-}
-
--(void)setFontName:(NSString *)_fontName{
-	fontName = [_fontName copy];
-	[self resetFontRef];
-}
--(void)setFontSize:(CGFloat)_fontSize{
-	fontSize = _fontSize;
-	[self resetFontRef];
-}
--(void)setTextColor:(UIColor *)_textColor{
-	textColor = _textColor;
-}
--(void)setImage:(UIImage *)_image{
-	image= _image;
-}
-
--(CTFontRef)fontRef{
-	if(!fontRef){
-		if(!fontName){
-			fontName = @"Helvetica";
-		}
-		if (fontSize == 0) {
-			fontSize = 12;
-		}
-		fontRef = CTFontCreateWithName((__bridge CFStringRef)fontName, fontSize, NULL);
+-(UIFont *)font{
+	if(!self.fontName){
+		self.fontName = @"Helvetica";
 	}
-	return fontRef;
+	if (self.fontSize == 0) {
+		self.fontSize = 12;
+	}
+	return [UIFont fontWithName:self.fontName size:self.fontSize];
 }
--(CGColorRef)colorRef{
-	if(textColor){
-		return [textColor CGColor];
-	}else{
-		return [[UIColor blackColor] CGColor];
+-(void)setFont:(UIFont *)font{
+	self.fontName = font.fontName;
+	self.fontSize = font.pointSize;
+}
+-(CGFloat)fontSize{
+	return [NMFont adjustContentSizeForContentSizeCategory:_fontSize];
+}
+
+-(NSString *)description{
+	NSString *description = [super description];
+	description = [NSString stringWithFormat:@"%@ <%@ (%f) – %@>", description, _fontName, _fontSize, _textColor];
+	return description;
+}
+
+#pragma mark - shadow
+-(void)createShadow{
+	if(!self.shadow){
+		_shadow = [NSShadow new];
 	}
 }
-
+-(CGSize)shadowOffset{
+	return self.shadow.shadowOffset;
+}
+-(void)setShadowOffset:(CGSize)shadowOffset{
+	[self createShadow];
+	self.shadow.shadowOffset = shadowOffset;
+}
+-(CGFloat)shadowBlurRadius{
+	return self.shadow.shadowBlurRadius;
+}
+-(void)setShadowBlurRadius:(CGFloat)shadowBlurRadius{
+	[self createShadow];
+	self.shadow.shadowBlurRadius = shadowBlurRadius;
+}
+-(UIColor *)shadowColor{
+	return self.shadow.shadowColor;
+}
+-(void)setShadowColor:(UIColor *)shadowColor{
+	[self createShadow];
+	self.shadow.shadowColor = shadowColor;
+}
 
 @end

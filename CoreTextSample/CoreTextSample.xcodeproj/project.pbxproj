@@ -29,6 +29,11 @@
 		D48558FB15CC7A7700A1E9D5 /* NMCustomLabelStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = D48558FA15CC7A7700A1E9D5 /* NMCustomLabelStyle.m */; };
 		D485590315CC7DC500A1E9D5 /* fez.png in Resources */ = {isa = PBXBuildFile; fileRef = D485590115CC7DC500A1E9D5 /* fez.png */; };
 		D485590415CC7DC500A1E9D5 /* fez@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D485590215CC7DC500A1E9D5 /* fez@2x.png */; };
+		EFB863CA19B2477A0005F6B4 /* NMFont.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB863C719B2477A0005F6B4 /* NMFont.m */; };
+		EFB863CB19B2477A0005F6B4 /* NMHTMLString.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB863C919B2477A0005F6B4 /* NMHTMLString.m */; };
+		EFB863D019B24EC90005F6B4 /* LICENSE.md in Resources */ = {isa = PBXBuildFile; fileRef = EFB863CF19B24EC90005F6B4 /* LICENSE.md */; };
+		EFB863D319B250910005F6B4 /* NMTextHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB863D219B250910005F6B4 /* NMTextHelper.m */; };
+		EFB863D519B256AF0005F6B4 /* CoreTextLabel.podspec in Resources */ = {isa = PBXBuildFile; fileRef = EFB863D419B256AF0005F6B4 /* CoreTextLabel.podspec */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,6 +66,14 @@
 		D48558FA15CC7A7700A1E9D5 /* NMCustomLabelStyle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NMCustomLabelStyle.m; path = ../../src/NMCustomLabelStyle.m; sourceTree = "<group>"; };
 		D485590115CC7DC500A1E9D5 /* fez.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fez.png; sourceTree = "<group>"; };
 		D485590215CC7DC500A1E9D5 /* fez@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "fez@2x.png"; sourceTree = "<group>"; };
+		EFB863C619B2477A0005F6B4 /* NMFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NMFont.h; path = ../../src/NMFont.h; sourceTree = "<group>"; };
+		EFB863C719B2477A0005F6B4 /* NMFont.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NMFont.m; path = ../../src/NMFont.m; sourceTree = "<group>"; };
+		EFB863C819B2477A0005F6B4 /* NMHTMLString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NMHTMLString.h; path = ../../src/NMHTMLString.h; sourceTree = "<group>"; };
+		EFB863C919B2477A0005F6B4 /* NMHTMLString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NMHTMLString.m; path = ../../src/NMHTMLString.m; sourceTree = "<group>"; };
+		EFB863CF19B24EC90005F6B4 /* LICENSE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE.md; path = ../LICENSE.md; sourceTree = "<group>"; };
+		EFB863D119B250910005F6B4 /* NMTextHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NMTextHelper.h; path = ../../src/NMTextHelper.h; sourceTree = "<group>"; };
+		EFB863D219B250910005F6B4 /* NMTextHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NMTextHelper.m; path = ../../src/NMTextHelper.m; sourceTree = "<group>"; };
+		EFB863D419B256AF0005F6B4 /* CoreTextLabel.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CoreTextLabel.podspec; path = ../CoreTextLabel.podspec; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,7 +94,9 @@
 		D4111A0F151A7FEB00EF6CC0 = {
 			isa = PBXGroup;
 			children = (
+				EFB863D419B256AF0005F6B4 /* CoreTextLabel.podspec */,
 				D439A656151B6D0D005BD830 /* README.md */,
+				EFB863CF19B24EC90005F6B4 /* LICENSE.md */,
 				D4111A24151A7FEB00EF6CC0 /* CoreTextSample */,
 				D4111A1D151A7FEB00EF6CC0 /* Frameworks */,
 				D4111A1B151A7FEB00EF6CC0 /* Products */,
@@ -149,6 +164,12 @@
 				D4111A45151A81EA00EF6CC0 /* NMCustomLabel.m */,
 				D48558F915CC7A7700A1E9D5 /* NMCustomLabelStyle.h */,
 				D48558FA15CC7A7700A1E9D5 /* NMCustomLabelStyle.m */,
+				EFB863C619B2477A0005F6B4 /* NMFont.h */,
+				EFB863C719B2477A0005F6B4 /* NMFont.m */,
+				EFB863C819B2477A0005F6B4 /* NMHTMLString.h */,
+				EFB863C919B2477A0005F6B4 /* NMHTMLString.m */,
+				EFB863D119B250910005F6B4 /* NMTextHelper.h */,
+				EFB863D219B250910005F6B4 /* NMTextHelper.m */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -180,7 +201,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = NM;
-				LastUpgradeCheck = 0430;
+				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = News.me;
 			};
 			buildConfigurationList = D4111A14151A7FEB00EF6CC0 /* Build configuration list for PBXProject "CoreTextSample" */;
@@ -210,7 +231,9 @@
 				D4111A35151A7FEB00EF6CC0 /* MainStoryboard_iPad.storyboard in Resources */,
 				D439A657151B6D0D005BD830 /* README.md in Resources */,
 				D4799273151D21E0007C2898 /* logo-57.png in Resources */,
+				EFB863D519B256AF0005F6B4 /* CoreTextLabel.podspec in Resources */,
 				D4799274151D21E0007C2898 /* logo-74.png in Resources */,
+				EFB863D019B24EC90005F6B4 /* LICENSE.md in Resources */,
 				D4799275151D21E0007C2898 /* logo-114.png in Resources */,
 				D4799276151D21E0007C2898 /* logo-150.png in Resources */,
 				D485590315CC7DC500A1E9D5 /* fez.png in Resources */,
@@ -228,11 +251,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EFB863D319B250910005F6B4 /* NMTextHelper.m in Sources */,
 				D4111A2B151A7FEB00EF6CC0 /* main.m in Sources */,
 				D4111A2F151A7FEB00EF6CC0 /* NMAppDelegate.m in Sources */,
 				D4111A38151A7FEB00EF6CC0 /* NMViewController.m in Sources */,
 				D4111A46151A81EA00EF6CC0 /* NMCustomLabel.m in Sources */,
 				D48558FB15CC7A7700A1E9D5 /* NMCustomLabelStyle.m in Sources */,
+				EFB863CA19B2477A0005F6B4 /* NMFont.m in Sources */,
+				EFB863CB19B2477A0005F6B4 /* NMHTMLString.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -270,8 +296,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -282,11 +313,15 @@
 					"$(inherited)",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = "";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -296,16 +331,24 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = "";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";

@@ -1,9 +1,8 @@
 //
 //  NMCustomLabel.m
-//  NewsMe
 //
-//  Created by Robert Haining on 8/30/11.
-//  Copyright 2012, News.me
+//  Created by Robert Haining
+//
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -20,179 +19,60 @@
 //
 
 #import "NMCustomLabel.h"
+#import "NMTextHelper.h"
+#import <QuartzCore/QuartzCore.h>
 
-static NSString *kNMImageInfoAttributeName = @"kNMImageInfoAttributeName";
-static NSString *kNMImageAttributeName = @"kNMImageAttributeName";
-static NSString *kNMImageVerticalOffsetAttributeName = @"kNMImageVerticalOffsetAttributeName";
+@interface NMCustomLabel()
+@property (nonatomic, readonly) CTFramesetterRef framesetter;
+@property (nonatomic, readonly) CTFrameRef ctFrame;
 
-static NSRegularExpression *usernameRegEx;
-static NSRegularExpression *usernameEndRegEx;
-static NSRegularExpression *hashtagRegEx;
-static NSRegularExpression *tagRegEx;
-//static NSRegularExpression *markupTagRegEx;
-static NSRegularExpression *spanTagRegEx;
-static NSCharacterSet *emojiCharacterSet;
-static NSCharacterSet *alphaNumericCharacterSet;
-
-@interface NMCustomLabel(Private)
--(void)createAttributedString;
-@property (nonatomic, strong) NSMutableDictionary *styles;
+@property (nonatomic, readonly) BOOL recogOutOfBounds;
 @end
 
 @implementation NMCustomLabel
 
-//, textColorBold
-@synthesize  cleanText, ctTextAlignment, linkColor, activeLinkColor, lineHeight, numberOfLines, shouldBoldAtNames, kern, delegate;
-@synthesize shouldLinkTypes;
+@synthesize htmlString = _htmlString;
 
-+(NSRegularExpression *)usernameRegEx{
-	return usernameEndRegEx;
-}
-+(NSRegularExpression *)hashtagRegEx{
-	return hashtagRegEx;
-}
-+(void)initialize{
-	if(!usernameRegEx){
-		NSError *error = NULL;
-		usernameRegEx = [NSRegularExpression regularExpressionWithPattern:@"(@.+?)(?:[^0-9A-Za-z_\\.]|$)" options:NSRegularExpressionCaseInsensitive error:&error];
-		if(!usernameRegEx){
-			NSLog(@"error creating regex: %@", error);
-		}
-	}
-	if(!usernameEndRegEx){
-		NSError *error = NULL;
-		usernameEndRegEx = [NSRegularExpression regularExpressionWithPattern:@"[^0-9A-Za-z_\\.]" options:NSRegularExpressionCaseInsensitive error:&error];
-		if(!usernameEndRegEx){
-			NSLog(@"error creating regex: %@", error);
-		}
-	}
-	if(!hashtagRegEx){
-		NSError *error = NULL;
-		hashtagRegEx = [NSRegularExpression regularExpressionWithPattern:@"[^0-9A-Za-z]" options:NSRegularExpressionCaseInsensitive error:&error];
-		if(!hashtagRegEx){
-			NSLog(@"error creating regex: %@", error);
-		}
-	}
-	if(!tagRegEx){
-		NSError *error = NULL;
-		tagRegEx = [NSRegularExpression regularExpressionWithPattern:@"<.+?>" options:NSRegularExpressionCaseInsensitive error:&error];
-		if(!tagRegEx){
-			NSLog(@"error creating regex: %@", error);
-		}
-	}
-//	if(!markupTagRegEx){
-//		NSError *error = NULL;
-//		markupTagRegEx = [NSRegularExpression regularExpressionWithPattern:@"<([bi])>.+?</[bi]>" options:NSRegularExpressionCaseInsensitive error:&error];
-//		if(!markupTagRegEx){
-//			NSLog(@"error creating markupTagRegEx: %@", error);
-//		}
-//	}
-	if(!spanTagRegEx){
-		NSError *error = NULL;
-		spanTagRegEx = [NSRegularExpression regularExpressionWithPattern:@"<span (.+?)>.+?</span>" options:NSRegularExpressionCaseInsensitive error:&error];
-		if(!spanTagRegEx){
-			NSLog(@"error creating spanTagRegEx: %@", error);
-		}
-	}
-	if(!emojiCharacterSet){
-		emojiCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"😄😊😃☺😉😍😘😚😳😌😁😜😝😒😏😓😔😞😖😥😰😨😣😢😭😂😲😱😠😡😪😷👿👽💛💙💜💗💚❤💔💓💘✨🌟💢❕❔💤💨💦🎶🎵🔥💩👍👎👌👊✊✌👋✋👐👆👇👉👈🙌🙏☝👏💪🚶🏃👫💃👯🙆🙅💁🙇💏💑💆💇💅👦👧👩👨👶👵👴👱👲👳👷👮👼👸💂💀👣💋👄👂👀👃☀☔☁⛄🌙⚡🌀🌊🐱🐶🐭🐹🐰🐺🐸🐯🐨🐻🐷🐮🐗🐵🐒🐴🐎🐫🐑🐘🐍🐦🐤🐔🐧🐛🐙🐠🐟🐳🐬💐🌸🌷🍀🌹🌻🌺🍁🍃🍂🌴🌵🌾🐚🎍💝🎎🎒🎓🎏🎆🎇🎐🎑🎃👻🎅🎄🎁🔔🎉🎈💿📀📷🎥💻📺📱📠☎💽📼🔊📢📣📻📡➿🔍🔓🔒🔑✂🔨💡📲📩📫📮🛀🚽💺💰🔱🚬💣🔫💊💉🏈🏀⚽⚾🎾⛳🎱🏊🏄🎿♠♥♣♦🏆👾🎯🀄🎬📝📖🎨🎤🎧🎺🎷🎸〽👟👡👠👢👕👔👗👘👙🎀🎩👑👒🌂💼👜💄💍💎☕🍵🍺🍻🍸🍶🍴🍔🍟🍝🍛🍱🍣🍙🍘🍚🍜🍲🍞🍳🍢🍡🍦🍧🎂🍰🍎🍊🍉🍓🍆🍅🏠🏫🏢🏣🏥🏦🏪🏩🏨💒⛪🏬🌇🌆🏧🏯🏰⛺🏭🗼🗻🌄🌅🌃🗽🌈🎡⛲🎢🚢🚤⛵✈🚀🚲🚙🚗🚕🚌🚓🚒🚑🚚🚃🚉🚄🚅🎫⛽🚥⚠🚧🔰🎰🚏💈♨🏁🎌🇯🇵🇰🇷🇨🇳🇺🇸🇫🇷🇪🇸🇮🇹🇷🇺🇬🇧🇩🇪1⃣2⃣3⃣4⃣5⃣6⃣7⃣8⃣9⃣0⃣#⃣⬆⬇⬅➡↗↖↘↙◀▶⏪⏩🆗🆕🔝🆙🆒🎦🈁📶🈵🈳🉐🈹🈯🈺🈶🈚🈷🈸🈂🚻🚹🚺🚼🚭🅿♿🚇🚾㊙㊗🔞🆔✳✴💟🆚📳📴💹💱♈♉♊♋♌♍♎♏♐♑♒♓⛎🔯🅰🅱🆎🅾🔲🔴🔳🕛🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚⭕❌©®™"];
-		
-		alphaNumericCharacterSet = [NSCharacterSet alphanumericCharacterSet];
-	}
-}
--(void)setShouldLinkTypes:(kNMShouldLink)_shouldLinkTypes{
-	shouldLinkTypes = _shouldLinkTypes;
-	self.userInteractionEnabled = YES;
-}
 -(void)setDefaults{
-	self.backgroundColor = [UIColor whiteColor];		
-	[self setDefaultStyle:[NMCustomLabelStyle new]];
-	
-	highlightedTextIndex = NSNotFound;
+	self.backgroundColor = [UIColor whiteColor];
+	self.numberOfLines = 0;
 }
--(UIColor *)backgroundColor{
-	if(backgroundCGColor){
-		return [UIColor colorWithCGColor:backgroundCGColor];
-	}else{
-		return nil;
-	}
+
+-(void)setTextAlignment:(NSTextAlignment)textAlignment{
+	[super setTextAlignment:textAlignment];
+    self.htmlString.textAlignment = textAlignment;
 }
--(void)setBackgroundColor:(UIColor *)backgroundColor{
-	if(backgroundCGColor){
-		CGColorRelease(backgroundCGColor);
-	}
-	backgroundCGColor = CGColorRetain(backgroundColor.CGColor);
-	if(CGColorGetAlpha(backgroundCGColor) < 0.1){
-		[super setBackgroundColor:[UIColor clearColor]];
-	}
-	[self setNeedsDisplay];
-}
--(UITextAlignment)textAlignment{
-	switch (ctTextAlignment) {
-		case kCTLeftTextAlignment:
-			return UITextAlignmentLeft;
-		case kCTRightTextAlignment:
-			return UITextAlignmentRight;
-		case kCTCenterTextAlignment:
-			return UITextAlignmentCenter;
-        default:
-            return UITextAlignmentLeft;
-	}
-	return UITextAlignmentLeft;
-}
--(void)setTextAlignment:(UITextAlignment)textAlignment{
-	switch (textAlignment) {
-		case UITextAlignmentLeft:
-			ctTextAlignment = kCTLeftTextAlignment;
-			break;
-		case UITextAlignmentCenter:
-			ctTextAlignment = kCTCenterTextAlignment;
-			break;
-		case UITextAlignmentRight:
-			ctTextAlignment = kCTRightTextAlignment;
-			break;
-		default:
-			ctTextAlignment = kCTLeftTextAlignment;
-			break;
-	}
-}
--(id)initWithFrame:(CGRect)frame{
+-(instancetype)initWithFrame:(CGRect)frame{
 	if(self = [super initWithFrame:frame]){
 		[self setDefaults];
 	}
 	return self;
 }
-- (id)init{
+- (instancetype)init{
     if (self = [super init]) {
 		[self setDefaults];
     }
     return self;
 }
 -(void)dealloc{
-	if(attrString){ CFRelease(attrString); }
-	if(framesetter){ CFRelease(framesetter); }
-	if(backgroundCGColor){ CGColorRelease(backgroundCGColor); }
-	if(ctFrame){ CFRelease(ctFrame); }
+	if(self.framesetter){ CFRelease(self.framesetter); }
+	if(self.ctFrame){ CFRelease(self.ctFrame); }
 }
--(CTFontRef)newCTFontWithUIFont:(UIFont *)font{
-	return CTFontCreateWithName((__bridge CFStringRef)font.fontName, font.pointSize, NULL);
-}
--(UIFont *)uiFontWithCTFont:(CTFontRef)ctFont{
-	if(ctFont){
-		CFStringRef nameRef = CTFontCopyName(ctFont, kCTFontFullNameKey);
-		NSString *name = (__bridge NSString *)nameRef;
-		UIFont *font = [UIFont fontWithName:name size:CTFontGetSize(ctFont)];
-		CFRelease(nameRef);
-		return font;
-	}else{
-		return nil;
-	}
+-(void)redraw{
+	[self clearAttrString];
+	[self setNeedsDisplay];
 }
 -(void)clearAttrString{
-	if(attrString){
-		CFRelease(attrString);
-		attrString = nil;
-	}
+	[self.htmlString clearAttributedString];
+}
+-(NSString *)cleanText{
+	return self.htmlString.cleanText;
+}
+-(void)setTextColor:(UIColor *)textColor{
+	[self.htmlString.defaultStyle setTextColor:textColor];
+}
+-(UIColor *)textColor{
+	return self.htmlString.defaultStyle.textColor;
 }
 -(void)setText:(NSString *)_text{
 	if([self.text isEqualToString:_text]){
@@ -200,506 +80,202 @@ static NSCharacterSet *alphaNumericCharacterSet;
 	}
 	
 	[super setText:_text];
+	[self clearAttrString];
+
+	self.htmlString.text = _text;
 	
 	if(self.text && self.text.length > 0){
-		cleanText = [tagRegEx stringByReplacingMatchesInString:self.text
-													   options:0
-														 range:NSMakeRange(0, [self.text length])
-												  withTemplate:@""];
-		[self clearAttrString];
+		BOOL isBaseRTL = [NMTextHelper textIsBaseRTL:self.text];
+		if(self.textAlignment == NSTextAlignmentLeft && isBaseRTL){
+			self.textAlignment = NSTextAlignmentRight;
+		}else if(self.textAlignment == NSTextAlignmentRight && !isBaseRTL){
+			self.textAlignment = NSTextAlignmentLeft;
+		}
 	}else{
-		if(cleanText){
-			cleanText = nil;
-		}
-		if(attrString){
-			CFRelease(attrString);
-			attrString = nil;
-		}
-		if(framesetter){
-			CFRelease(framesetter);
-			framesetter = nil;
+		if(self.framesetter){
+			CFRelease(self.framesetter);
+			_framesetter = nil;
 		}
 	}
 	[self setNeedsDisplay];
-	highlightedTextIndex = NSNotFound;
-}
--(void)didUpdateColor{
-	if(attrString){
-		[self clearAttrString];
-		[self setNeedsDisplay];
-	}
 }
 
--(NSMutableDictionary *)styles{
-	if(!styles){
-		styles = [NSMutableDictionary dictionaryWithCapacity:5];
+-(NMHTMLString *)htmlString{
+	if(!_htmlString){
+		_htmlString = [[NMHTMLString alloc] init];
+		_htmlString.delegate = self;
 	}
-	return styles;
-}
--(void)setStyle:(NMCustomLabelStyle *)style forKey:(NSString *)key{
-	[self.styles setObject:style forKey:[key lowercaseString]];
-}
--(void)setDefaultStyle:(NMCustomLabelStyle *)style{
-	[self setStyle:style forKey:NMCustomLabelStyleDefaultKey];
-}
--(NMCustomLabelStyle *)defaultStyle{
-	if([self.styles objectForKey:NMCustomLabelStyleDefaultKey]){
-		return [self.styles objectForKey:NMCustomLabelStyleDefaultKey];
-	}else{
-		return [NMCustomLabelStyle new];
-	}
-}
--(void)setLinkColor:(UIColor *)color{
-	if([linkColor isEqual:color]){
-		return;
-	}
-	linkColor = color;
-	[self didUpdateColor];
-}
--(void)setActiveLinkColor:(UIColor *)color{
-	if([activeLinkColor isEqual:color]){
-		return;
-	}
-	activeLinkColor = color;
+	return _htmlString;
 }
 
 -(void)createAttributedString{
-	if(!self.text || self.text.length == 0){ 
-		//no text. return.
-		return; 
-	}
-//	NSLog(@"customlabel - create - %@", text);
-	
-	[self clearAttrString];
-	attrString = CFAttributedStringCreateMutable(kCFAllocatorDefault, 0);
-	
-	CFAttributedStringReplaceString (attrString, CFRangeMake(0, 0), (__bridge CFStringRef)cleanText);
-	
-	NMCustomLabelStyle *defaultStyle = [self defaultStyle];
-
-	//set default color
-	CFAttributedStringSetAttribute(attrString, CFRangeMake(0, CFAttributedStringGetLength(attrString)), kCTForegroundColorAttributeName, defaultStyle.colorRef);
-	
-	//set default font
-	CFAttributedStringSetAttribute(attrString, CFRangeMake(0, CFAttributedStringGetLength(attrString)), kCTFontAttributeName, defaultStyle.fontRef);
-	
-	__block int locOfTag = -1;
-	__block int totalTagLength = 0;
-//	static int eachTagLength = 7;
-/*	
-	[markupTagRegEx enumerateMatchesInString:self.text options:0 range:NSMakeRange(0, [self.text length]) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop){
-		
-		NSRange markupRange = [match range];
-		markupRange.length -= eachTagLength;
-		markupRange.location -= totalTagLength;
-		locOfTag = markupRange.location + markupRange.length;
-		totalTagLength += eachTagLength;
-		
-		CTFontRef font=nil;
-		UIColor *color=nil;
-		if(match.numberOfRanges > 1){
-			NSRange tagTypeRange = [match rangeAtIndex:1];
-			NSString *tagType = [[self.text substringWithRange:tagTypeRange] lowercaseString];
-			if([tagType isEqualToString:@"b"]){
-				font = bodyFontBold;
-				color = textColorBold;
-			}else if([tagType isEqualToString:@"i"]){
-				font = bodyFontItalic;
-				color = self.textColor;
-			}
-		}
-		if(font && color){
-			NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)font, kCTFontAttributeName, [color CGColor], kCTForegroundColorAttributeName, nil];
-			CFAttributedStringSetAttributes(attrString, CFRangeMake(markupRange.location, markupRange.length), (__bridge CFDictionaryRef)attributes, NO);
-		}
-	}];
- */
-	[spanTagRegEx enumerateMatchesInString:self.text options:0 range:NSMakeRange(0, [self.text length]) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop){
-		int thisTagLength = 14;
-	
-		CTFontRef font=nil;
-		CGColorRef color=nil;
-		UIImage *image=nil;
-		CGFloat imageVerticalOffset=0;
-		if(match.numberOfRanges > 1){
-			NSRange tagTypeRange = [match rangeAtIndex:1];
-			thisTagLength += tagTypeRange.length;
-			NSString *tagInfo = [[self.text substringWithRange:tagTypeRange] lowercaseString];
-			tagInfo = [tagInfo stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-			NSArray *metadata = [tagInfo componentsSeparatedByString:@"="];
-			if(metadata.count == 2 && [[metadata objectAtIndex:0] isEqualToString:@"class"]){
-				NSString *styleKey = [metadata objectAtIndex:1];
-				styleKey = [styleKey stringByTrimmingCharactersInSet:[NSCharacterSet punctuationCharacterSet]];
-				NMCustomLabelStyle *style = [self.styles objectForKey:styleKey];
-				if(style){
-					font = style.fontRef;
-					color = style.colorRef;
-					image = style.image;
-					imageVerticalOffset = style.imageVerticalOffset;
-				}
-			}
-		}
-		
-		NSRange markupRange = [match range];
-		markupRange.length -= thisTagLength;
-		markupRange.location -= totalTagLength;
-		locOfTag = markupRange.location + markupRange.length;
-		totalTagLength += thisTagLength;
-		
-		if(font && color){
-			NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)font, kCTFontAttributeName, color, kCTForegroundColorAttributeName, nil];
-			CFAttributedStringSetAttributes(attrString, CFRangeMake(markupRange.location, markupRange.length), (__bridge CFDictionaryRef)attributes, NO);
-		}
-		if(image){
-			NSDictionary *imageAttr = [NSDictionary dictionaryWithObjectsAndKeys:image, kNMImageAttributeName, [NSNumber numberWithFloat:imageVerticalOffset], kNMImageVerticalOffsetAttributeName, nil];
-			NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:imageAttr, kNMImageInfoAttributeName, nil];
-			CFAttributedStringSetAttributes(attrString, CFRangeMake(markupRange.location, markupRange.length), (__bridge CFDictionaryRef)attributes, NO);			
-		}
-
-	}];
-
-	if(self.shouldBoldAtNames && (self.shouldLinkTypes & kNMShouldLinkUsernames) ){
-		[usernameRegEx enumerateMatchesInString:self.text options:0 range:NSMakeRange(0, [self.text length]) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop){
-			
-			if(match.numberOfRanges > 1){
-				NSRange range = [match rangeAtIndex:1];
-				if(range.length > 1){ //aka not just an '@' symbol
-//					if(locOfTag >= 0 && locOfTag < boldRange.location){
-//						boldRange.location -= totalTagLength;
-//					}
-					
-					NSDictionary *attributes;
-					if(linkColor){
-						UIColor *tehLinkColor = linkColor;
-						if(highlightedTextIndex != NSNotFound){
-							if(highlightedTextIndex >= range.location && highlightedTextIndex < range.location+range.length){
-								highlightedTextType = kNMTextTypeUsername;
-								tehLinkColor = activeLinkColor;
-								highlightedText = [cleanText substringWithRange:NSMakeRange(range.location, range.length)];
-							}
-						}
-						attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)[tehLinkColor CGColor], kCTForegroundColorAttributeName, nil];
-					}else{
-						NMCustomLabelStyle *boldStyle = [self.styles objectForKey:NMCustomLabelStyleBoldKey];
-						attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)boldStyle.fontRef, kCTFontAttributeName, (__bridge id)[boldStyle colorRef], kCTForegroundColorAttributeName, nil];
-					}
-					CFAttributedStringSetAttributes(attrString, CFRangeMake(range.location, range.length), (__bridge CFDictionaryRef)attributes, NO);
-				}
-			}
-		}];
-	}
-	
-	if(self.shouldLinkTypes & kNMShouldLinkURLs){
-		NSError *error = NULL;
-		NSDataDetector *detector = [NSDataDetector dataDetectorWithTypes:(NSTextCheckingTypes)NSTextCheckingTypeLink error:&error];
-		[detector enumerateMatchesInString:self.cleanText options:0 range:NSMakeRange(0, [self.cleanText length]) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop){
-			
-			NSRange matchRange = [match range];
-			NSDictionary *attributes;
-			if(linkColor){
-				UIColor *tehLinkColor = linkColor;
-				if(highlightedTextIndex != NSNotFound){
-					if(highlightedTextIndex >= matchRange.location && highlightedTextIndex < matchRange.location+matchRange.length){
-						highlightedTextType = kNMTextTypeLink;
-						tehLinkColor = activeLinkColor;
-						highlightedText = [cleanText substringWithRange:NSMakeRange(matchRange.location, matchRange.length)];
-					}
-				}
-				attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)[tehLinkColor CGColor], kCTForegroundColorAttributeName, nil];
-			}else{
-				NMCustomLabelStyle *boldStyle = [self.styles objectForKey:NMCustomLabelStyleBoldKey];
-				attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)boldStyle.fontRef, kCTFontAttributeName, (__bridge id)[boldStyle colorRef], kCTForegroundColorAttributeName, nil];
-			}
-			CFAttributedStringSetAttributes(attrString, CFRangeMake(matchRange.location, matchRange.length), (__bridge CFDictionaryRef)attributes, NO);
-		}];
-	}
-		
-	NSRange range = [self.cleanText rangeOfCharacterFromSet:emojiCharacterSet options:NSLiteralSearch range:NSMakeRange(0, self.cleanText.length)];
-	while(range.location != NSNotFound){
-		NSString *substring = [self.cleanText substringWithRange:range];
-		if([substring rangeOfCharacterFromSet:alphaNumericCharacterSet options:NSLiteralSearch range:NSMakeRange(0, substring.length)].location == NSNotFound){
-//			NSLog(@"EMOJIII: %@", substring);
-			
-			CFDictionaryRef currentAttributes = CFAttributedStringGetAttributes(attrString, range.location, NULL);
-			CTFontRef currentFont = CFDictionaryGetValue(currentAttributes, @"NSFont");
-			CFStringRef currentFontName = CTFontCopyFullName(currentFont);
-			CTFontRef smallerFont = CTFontCreateWithName(currentFontName, CTFontGetSize(currentFont) * 0.8, NULL);
-			
-			NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)smallerFont, kCTFontAttributeName, nil];
-			CFRange emojiRange = CFRangeMake(range.location, range.length); 
-			CFAttributedStringSetAttributes(attrString, emojiRange, (__bridge CFDictionaryRef)attributes, NO);
-			
-			CFRelease(currentFontName);
-			CFRelease(smallerFont);
-		}
-		
-		CGFloat location = range.location + range.length;
-		range = [self.cleanText rangeOfCharacterFromSet:emojiCharacterSet options:NSLiteralSearch range:NSMakeRange(location, self.cleanText.length-location)];
-	}
-	
-	//create paragraph style and assign text alignment to it
-	int numParagraphSpecifiers = 3;
-	CTParagraphStyleSetting _settings[] = { 
-		{kCTParagraphStyleSpecifierAlignment, sizeof(ctTextAlignment), &ctTextAlignment},
-		{kCTParagraphStyleSpecifierMaximumLineHeight, sizeof(CGFloat), &lineHeight},
-		{kCTParagraphStyleSpecifierMinimumLineHeight, sizeof(CGFloat), &lineHeight},
-//		{kCTParagraphStyleSpecifierLineBreakMode, sizeof(CTLineBreakMode), &lineBreakMode},
-		{kCTParagraphStyleSpecifierCount, sizeof(int), &numParagraphSpecifiers}
-	};
-	CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(_settings, sizeof(_settings) / sizeof(_settings[0]));
-	CFAttributedStringSetAttribute(attrString, CFRangeMake(0, CFAttributedStringGetLength(attrString)), kCTParagraphStyleAttributeName, paragraphStyle);
-	
-	CFNumberRef kernValue = (__bridge  CFNumberRef) [NSNumber numberWithFloat:kern];
-	CFAttributedStringSetAttribute(attrString, CFRangeMake(0, CFAttributedStringGetLength(attrString)), kCTKernAttributeName, kernValue);
-	
-	if(framesetter){
-		CFRelease(framesetter);
-	}
-	framesetter = CTFramesetterCreateWithAttributedString(attrString);
-	
-	CFRelease(paragraphStyle);
+	[self.htmlString createAttributedString];
 }
-
+-(void)createAttributedStringIfNeeded{
+	if(!self.htmlString.attributedString){
+		[self createAttributedString];
+	}
+}
 
 - (CGSize)sizeThatFits:(CGSize)size{
 	if(!self.text || self.text.length == 0){
 		return CGSizeZero;
 	}
-	CGSize suggestedSize = CGSizeZero;
-	if(!attrString){
-		[self createAttributedString];
-	}
-	if(framesetter){
-		if(size.width < 1){ size.width = 10000; }
-		if(size.height < 1){ size.height = 10000; }
-		suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(
-																	 framesetter, /* Framesetter */
-																	 CFRangeMake(0, CFAttributedStringGetLength(attrString)), /* String range (entire string) */
-																	 NULL, /* Frame attributes */
-																	 size, /* Constraints (CGFLOAT_MAX indicates unconstrained) */
-																	 NULL /* Gives the range of string that fits into the constraints, doesn't matter in your situation */
-																	 );
-		//on iOS 4, we were getting heights of 14.9 where the line height was 15, so it was getting cut off.  after we stop supporting iOS 4, we could safely kill these lines.
-		suggestedSize.width = round(suggestedSize.width);
-		suggestedSize.height = round(suggestedSize.height);
 
-//		NSLog(@"NMCustomLabel-sizeThatFits: %@ %@ --> %@", cleanText, NSStringFromCGSize(size), NSStringFromCGSize(suggestedSize));
-	}else{
-		suggestedSize = size;
+	if(size.width < 1){ size.width = CGFLOAT_MAX; }
+	if(size.height < 1){ size.height = CGFLOAT_MAX; }
+	
+	[self createAttributedStringIfNeeded];
+	
+	CGSize suggestedSize = CGSizeZero;
+
+    suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(self.framesetter, CFRangeMake(0, self.htmlString.length), NULL, size, NULL);
+	suggestedSize.width = ceil(suggestedSize.width);
+	suggestedSize.height = ceil(suggestedSize.height);
+
+	if(self.numberOfLines > 0 && self.htmlString.lineHeight > 0){
+		if(suggestedSize.height / self.htmlString.lineHeight > self.numberOfLines){
+			suggestedSize.height = self.numberOfLines * self.htmlString.lineHeight;
+		}
 	}
-//	if(NO){
-//		if(self.numberOfLines > 0 && self.lineHeight > 0){
-//			if(suggestedSize.height / self.lineHeight > self.numberOfLines){
-//				CGFloat oldheight = suggestedSize.height;
-//				suggestedSize.height = self.numberOfLines * self.lineHeight;
-//				NSLog(@"suggested height reduced from %f to %f", oldheight, suggestedSize.height);
-//				shouldTruncate = YES;
-//			}
-//		}
-//	}	
 	return suggestedSize;
 }
--(void)setFrame:(CGRect)frame{
-	if(!CGRectEqualToRect(self.frame, frame)){
-		[super setFrame:frame];
-		[self setNeedsDisplay];
-	}
-}
-- (void)drawTextInRect:(CGRect)rect{
-//	NSLog(@"drawRect: %@ - %@", NSStringFromCGRect(rect), text);
-	
-	CGContextRef context = UIGraphicsGetCurrentContext();
-	CGContextClearRect(context, rect);
-	if(backgroundCGColor){
-		CGContextSetFillColorWithColor(context, backgroundCGColor);
-		CGContextFillRect(context, rect);
-	}
 
+- (void)drawTextInRect:(CGRect)rect{
 	if(!self.text || self.text.length == 0){
 		return;
 	}
-	CGSize fullSize = [self sizeThatFits:CGSizeMake(rect.size.width, 1000.0)];
 	
-//	NSLog(@"taco - %f > %d", fullSize.height /  self.lineHeight, self.numberOfLines);
-	if(self.numberOfLines && self.lineHeight && fullSize.height / self.lineHeight > self.numberOfLines){
-		shouldTruncate = YES;
-	}	
+	[self createAttributedStringIfNeeded];
 
-	if(!attrString){
-		[self createAttributedString];
+    CGFloat contentHeight = [self sizeThatFits:rect.size].height;
+    if(contentHeight < rect.size.height){
+        switch (self.verticalAlign) {
+            case kNMAlignCenter:
+                rect.origin.y = (rect.size.height - contentHeight) / 2.0;
+                rect.size.height = contentHeight;
+                break;
+            case kNMAlignBottom:
+                rect.origin.y = rect.size.height - contentHeight;
+                rect.size.height = contentHeight;
+                break;
+            default:
+                break;
+        }
+    }
+    
+    [self.attributedText drawWithRect:rect options:(NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingTruncatesLastVisibleLine) context:nil];
+    
+    if([NMCustomLabel attributedStringSupportsImages:self.attributedText]){
+        if(self.ctFrame){
+            CFRelease(self.ctFrame);
+            _ctFrame = nil;
+        }
+        
+        CGMutablePathRef framePath = CGPathCreateMutable();
+        CGRect frameRect = rect;
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        if(context){
+            CGContextSetTextMatrix(context, CGAffineTransformIdentity);
+            CGContextTranslateCTM(context, 0.0, self.bounds.size.height);
+            CGContextScaleCTM(context, 1.0, -1.0);
+            
+            CGAffineTransform reverseT = CGAffineTransformIdentity;
+            reverseT = CGAffineTransformScale(reverseT, 1.0, -1.0);
+            reverseT = CGAffineTransformTranslate(reverseT, 0.0, -self.bounds.size.height);
+            
+            CGPathAddRect(framePath, NULL, CGRectApplyAffineTransform(frameRect, reverseT));
+            _ctFrame = CTFramesetterCreateFrame(self.framesetter, CFRangeMake(0, [self.htmlString length]), framePath, NULL);
+            
+            [self drawImagesForFrame:self.ctFrame fromAttributedString:self.attributedText context:context];
+        }else{
+            NSLog(@"no context for custom label drawTextInRect");
+        }
+        
+        CFRelease(framePath);
+    }
+
+	if(!_pressRecog){
+        _pressRecog = [NMCustomLabel newLongPressGestureRecognizer];
+        self.pressRecog.delegate = self;
+		[self addGestureRecognizer:self.pressRecog];
 	}
-//	if(YES && numberOfLines > 0 && shouldTruncate){
-	if(YES){
-		// don't set any line break modes, etc, just let the frame draw as many full lines as will fit 
-		CGRect frameRect = rect;
-		CGMutablePathRef framePath = CGPathCreateMutable(); 
-//		CGPathAddRect(framePath, NULL, frameRect); 
-		
-		CGContextSetTextMatrix(context, CGAffineTransformIdentity);
-		CGContextTranslateCTM(context, 0.0, self.bounds.size.height);
-		CGContextScaleCTM(context, 1.0, -1.0);
-		
-		CGAffineTransform reverseT = CGAffineTransformIdentity;
-		reverseT = CGAffineTransformScale(reverseT, 1.0, -1.0);
-		reverseT = CGAffineTransformTranslate(reverseT, 0.0, -self.bounds.size.height);
-		
-		CGPathAddRect(framePath, NULL, CGRectApplyAffineTransform(frameRect, reverseT));
+}
++(UILongPressGestureRecognizer *)newLongPressGestureRecognizer{
+    UILongPressGestureRecognizer *pressRecog = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(didPress:)];
+    pressRecog.minimumPressDuration = 0.05;
+    pressRecog.delaysTouchesBegan = YES;
+    pressRecog.delaysTouchesEnded = YES;
+    pressRecog.cancelsTouchesInView = YES;
+    return pressRecog;
+}
 
-		if(ctFrame){
-			CFRelease(ctFrame);
-		}
-		ctFrame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, CFAttributedStringGetLength(attrString)), framePath, NULL); 
-		CFArrayRef lines = CTFrameGetLines(ctFrame); 
-		CFIndex count = CFArrayGetCount(lines);
-		if(count == 0){
-			CGPathRelease(framePath);
-			CFRelease(ctFrame);
-			return;
-		}
-		CGPoint origins[count];//the origins of each line at the baseline
-		CFRange range = CFRangeMake(0, count);
-		CTFrameGetLineOrigins(ctFrame, range, origins); 
-		// note that we only enumerate to count-1 in here-- we draw the last line separately 
-		for (CFIndex i = 0; i < count-1; i++) 
-		{ 
-			// draw each line in the correct position as-is 
-			CGContextSetTextPosition(context, origins[i].x, origins[i].y); 
-			CTLineRef line = (CTLineRef)CFArrayGetValueAtIndex(lines, i); 
-			CTLineDraw(line, context); 
-		} 
-		
-		// truncate the last line before drawing it 
-		CGPoint lastOrigin = origins[count-1]; 
-		CTLineRef lastLine = CFArrayGetValueAtIndex(lines, count-1); 
-		// truncation token is a CTLineRef itself 
-		CFDictionaryRef stringAttrs = nil;
-		CFAttributedStringRef truncationString = CFAttributedStringCreate(NULL, CFSTR("\u2026"), stringAttrs); 
-		CTLineRef truncationToken = CTLineCreateWithAttributedString(truncationString); 
-		CFRelease(truncationString); 
-		// now create the truncated line -- need to grab extra characters from the source string, 
-		// or else the system will see the line as already fitting within the given width and 
-		// will not truncate it. 
-		// range to cover everything from the start of lastLine to the end of the string 
-		CFRange rng = CFRangeMake(CTLineGetStringRange(lastLine).location, 0); 
-		rng.length = CFAttributedStringGetLength(attrString) - rng.location; 
-		// substring with that range 
-		CFAttributedStringRef longString = CFAttributedStringCreateWithSubstring(NULL, attrString, rng); 
-		// line for that string 
-		CTLineRef longLine = CTLineCreateWithAttributedString(longString); 
-		CFRelease(longString); 
-		CTLineRef truncated = CTLineCreateTruncatedLine(longLine, frameRect.size.width, kCTLineTruncationEnd, truncationToken); 
-		CFRelease(longLine); 
-		CFRelease(truncationToken); 
-		// if 'truncated' is NULL, then no truncation was required to fit it 
-		if (truncated == NULL) 
-			truncated = (CTLineRef)CFRetain(lastLine); 
-		// draw it at the same offset as the non-truncated version 
-		CGContextSetTextPosition(context, lastOrigin.x, lastOrigin.y); 
-		CTLineDraw(truncated, context); 
-		CFRelease(truncated);
-		
-		[self drawImagesForFrame:ctFrame fromAttributedString:(__bridge NSAttributedString *)attrString];
-
-		CGPathRelease(framePath);
-
-	}else{
-		
-		CGRect topRect = self.frame;
-		topRect.origin = CGPointZero;
-		
-		CGContextSetTextMatrix(context, CGAffineTransformIdentity);
-		CGContextTranslateCTM(context, 0.0, self.bounds.size.height);
-		CGContextScaleCTM(context, 1.0, -1.0);
-		
-		CGAffineTransform reverseT = CGAffineTransformIdentity;
-		reverseT = CGAffineTransformScale(reverseT, 1.0, -1.0);
-		reverseT = CGAffineTransformTranslate(reverseT, 0.0, -self.bounds.size.height);
-		
-		
-		CGMutablePathRef topFramePath = CGPathCreateMutable();
-		CGPathAddRect(topFramePath, NULL, CGRectApplyAffineTransform(topRect, reverseT));
-		
-		CTFrameRef topFrame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0,0), topFramePath, NULL);  
-		CFRelease(topFramePath);
-		CTFrameDraw(topFrame, context);
-		CFRelease(topFrame);
-		
-		CGAffineTransform ctm = CGContextGetCTM(context);
-		CGContextConcatCTM(context, CGAffineTransformInvert(ctm));
-
-	}	
-	if(!pressRecog){
-		pressRecog = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(didPress:)];
-		pressRecog.minimumPressDuration = 0.05;
-		pressRecog.delaysTouchesBegan = YES;
-		pressRecog.delaysTouchesEnded = YES;
-		pressRecog.cancelsTouchesInView = YES;
-		pressRecog.delegate = self;
-//		pressRecog.allowableMovement = 5; //pixels.. default=10
-		[self addGestureRecognizer:pressRecog];
-//		if([self.delegate respondsToSelector:@selector(customLabel:didAddGestureRecog:)]){
-//			[self.delegate customLabel:self didAddGestureRecog:pressRecog];
-//		}
-	}
++(BOOL)attributedStringSupportsImages:(NSAttributedString *)string{
+	__block BOOL supportsImages = NO;
+    [string enumerateAttribute:kNMImageInfoAttributeName inRange:NSMakeRange(0, [string length]) options:0 usingBlock:^(id value, NSRange range, BOOL *stop) {
+		supportsImages = YES;
+		*stop = YES;
+	}];
+	return supportsImages;
 }
 
 //borrowed from https://github.com/adamjernst/AEImageAttributedString/blob/master/AEImageAttributedString/AEImageAttributedString.m
--(void)drawImagesForFrame:(CTFrameRef)frame fromAttributedString:(NSAttributedString *)string {
+-(void)drawImagesForFrame:(CTFrameRef)frame fromAttributedString:(NSAttributedString *)string context:(CGContextRef)context{
     CGRect rect = CGPathGetBoundingBox(CTFrameGetPath(frame));
 	CFArrayRef lines = CTFrameGetLines(frame);
-	
-    CGContextRef c = UIGraphicsGetCurrentContext();
+	if(!lines){
+		return;
+	}
     
-    [string enumerateAttribute:kNMImageInfoAttributeName inRange:NSMakeRange(0, [string length]) options:0 usingBlock:^(id value, NSRange range, BOOL *stop) {
-		NSDictionary *attributes = (NSDictionary *)value;
-		UIImage *image = [attributes objectForKey:kNMImageAttributeName];
-		CGFloat verticalOffset = [[attributes objectForKey:kNMImageVerticalOffsetAttributeName] floatValue];
-		
-		if(!image){
-			return;
-		}
-		
-		CGRect imageRect = {
-			.origin = rect.origin,
-			.size = image.size
-		};
-		
-		for (CFIndex i = 0; i < CFArrayGetCount(lines); i++) {
-			CTLineRef line = CFArrayGetValueAtIndex(lines, i);
-			CFRange r = CTLineGetStringRange(line);
-			int localIndex = range.location - r.location;
-			if (localIndex >= 0 && localIndex < r.length) {
-				imageRect.origin.x += CTLineGetOffsetForStringIndex(line, range.location, NULL);
-				CGPoint lineOrigin;
-				CTFrameGetLineOrigins(frame, CFRangeMake(i, 1), &lineOrigin);
-				imageRect.origin.x += lineOrigin.x;
-				imageRect.origin.y += lineOrigin.y - 2.0f;
-				break;
+	if(context){
+		[string enumerateAttribute:kNMImageInfoAttributeName inRange:NSMakeRange(0, [string length]) options:0 usingBlock:^(id value, NSRange range, BOOL *stop) {
+			NSDictionary *attributes = (NSDictionary *)value;
+			UIImage *image = attributes[kNMImageAttributeName];
+			CGFloat verticalOffset = [attributes[kNMImageVerticalOffsetAttributeName] floatValue];
+			
+			if(!image){
+				return;
 			}
-		}
-		imageRect.origin.y += verticalOffset;
-		
-		CGContextDrawImage(c, imageRect, image.CGImage);
-	}];
+			
+			CGRect imageRect = {
+				.origin = rect.origin,
+				.size = image.size
+			};
+			
+			for (CFIndex i = 0; i < CFArrayGetCount(lines); i++) {
+				CTLineRef line = CFArrayGetValueAtIndex(lines, i);
+				CFRange r = CTLineGetStringRange(line);
+				NSInteger localIndex = range.location - r.location;
+				if (localIndex >= 0 && localIndex < r.length) {
+					imageRect.origin.x += CTLineGetOffsetForStringIndex(line, range.location, NULL);
+					CGPoint lineOrigin;
+					CTFrameGetLineOrigins(frame, CFRangeMake(i, 1), &lineOrigin);
+					imageRect.origin.x += lineOrigin.x;
+					imageRect.origin.y += lineOrigin.y - 2.0f;
+					break;
+				}
+			}
+			imageRect.origin.y += verticalOffset;
+			
+			CGContextDrawImage(context, imageRect, image.CGImage);
+		}];
+	}else{
+		NSLog(@"no context for custom label drawImages");
+	}
 }
 
-
-
-
-
 -(CGFloat)stringIndexAtLocation:(CGPoint)location{
-	CFArrayRef lines = CTFrameGetLines(ctFrame); 
+	CFArrayRef lines = CTFrameGetLines(self.ctFrame);
 	CFIndex numLines = CFArrayGetCount(lines);
 	CGPoint origins[numLines];//the origins of each line at the baseline
 	CFRange range = CFRangeMake(0, numLines);
-	CTFrameGetLineOrigins(ctFrame, range, origins); 
+	CTFrameGetLineOrigins(self.ctFrame, range, origins);
 	for (CFIndex i = 0; i < numLines; i++){
 		CGPoint origin = origins[i];
-		if(location.y >= origin.y && location.y < origin.y + lineHeight){
+		if(location.y >= origin.y && location.y < origin.y + self.htmlString.lineHeight){
 			CFIndex lineIndex = numLines-i-1;
 			CTLineRef line = (CTLineRef)CFArrayGetValueAtIndex(lines, lineIndex); 
 			CFIndex stringIndex = CTLineGetStringIndexForPosition(line, CGPointMake(location.x, 0));
-//			NSLog(@"stringIndex = %ld", stringIndex);
 			return stringIndex;
 		}
 	}
@@ -707,43 +283,36 @@ static NSCharacterSet *alphaNumericCharacterSet;
 }
 -(void)performActionOnHighlightedText{
 	if([self.delegate respondsToSelector:@selector(customLabel:didSelectText:type:)]){
-		[self.delegate customLabel:self didSelectText:highlightedText type:highlightedTextType];
+		[self.delegate customLabel:self didSelectText:self.htmlString.highlightedText type:self.htmlString.highlightedTextType];
 	}
 }
--(BOOL)hasHighlightedText{
-	return highlightedTextIndex != NSNotFound;
-}
 -(void)resetHighlightedText{
-	highlightedTextIndex = NSNotFound;
-	highlightedText = nil;
-	highlightedTextType = kNMTextTypeNone;
+	[self.htmlString resetHighlightedText];
 	[self createAttributedString];
 	[self setNeedsDisplay];
 }
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)recog shouldReceiveTouch:(UITouch *)touch{
-//	NSLog(@"shouldReceiveTouch: %@", touch);
 	CGPoint location = [touch locationInView:self];
-	highlightedTextIndex = [self stringIndexAtLocation:location];
-	[self createAttributedString];
-	return highlightedText != nil;
+	self.htmlString.highlightedTextIndex = [self stringIndexAtLocation:location];
+	[self.htmlString resetAttributedString];
+	return self.htmlString.highlightedText != nil;
 }
 
 -(void)didPress:(UILongPressGestureRecognizer *)recog{
 	CGPoint location = [recog locationInView:self];
-//	NSLog(@"didPress: touch= %@ , bounds = %@ - state = %d", NSStringFromCGPoint(location), NSStringFromCGRect(self.bounds), recog.state);
 	
 	if(!CGRectContainsPoint(self.bounds, location)){
-		recogOutOfBounds = YES;
+		_recogOutOfBounds = YES;
 	}
 
 	switch (recog.state) {
 		case UIGestureRecognizerStateBegan:
-			recogOutOfBounds = NO; //reset.
-			if(highlightedTextIndex == NSNotFound){
-				highlightedTextIndex = [self stringIndexAtLocation:location];
+			_recogOutOfBounds = NO; //reset.
+			if(self.htmlString.highlightedTextIndex == NSNotFound){
+				self.htmlString.highlightedTextIndex = [self stringIndexAtLocation:location];
 				[self createAttributedString];
 			}
-			if(highlightedText){
+			if(self.htmlString.highlightedText){
 				if([self.delegate respondsToSelector:@selector(customLabelDidBeginTouch:recog:)]){
 					[self.delegate customLabelDidBeginTouch:self recog:recog];
 				}
@@ -759,9 +328,7 @@ static NSCharacterSet *alphaNumericCharacterSet;
 			if([self.delegate respondsToSelector:@selector(customLabel:didChange:)]){
 				[self.delegate customLabel:self didChange:recog];
 			}
-			if(recogOutOfBounds){
-//				recog.enabled = NO;
-//				recog.enabled = YES;
+			if(self.recogOutOfBounds){
 				[self resetHighlightedText];
 				if([self.delegate respondsToSelector:@selector(customLabelDidEndTouchOutsideOfHighlightedText:recog:)]){
 					[self.delegate customLabelDidEndTouchOutsideOfHighlightedText:self recog:recog];
@@ -770,13 +337,13 @@ static NSCharacterSet *alphaNumericCharacterSet;
 			break;
 		
 		case UIGestureRecognizerStateEnded:
-			if(highlightedText && !recogOutOfBounds){
+			if(self.htmlString.highlightedText && !self.recogOutOfBounds){
 				[self performActionOnHighlightedText];
 			}
 			//no break;
 		case UIGestureRecognizerStateCancelled:
 		case UIGestureRecognizerStateFailed:
-			if(highlightedText && !recogOutOfBounds){
+			if(self.htmlString.highlightedText && !self.recogOutOfBounds){
 				if([self.delegate respondsToSelector:@selector(customLabelDidEndTouch:recog:)]){
 					[self.delegate customLabelDidEndTouch:self recog:recog];
 				}
@@ -794,5 +361,27 @@ static NSCharacterSet *alphaNumericCharacterSet;
 	}
 }
 
+#pragma mark - NMHTMLStringDelegate
+-(void)htmlStringDidUpdateAttributedString:(NMHTMLString *)htmlString{
+    self.attributedText = self.htmlString.attributedString;
+
+	if(self.framesetter){
+		CFRelease(self.framesetter);
+	}
+    _framesetter = CTFramesetterCreateWithAttributedString((__bridge CFMutableAttributedStringRef)(self.htmlString.attributedString));
+}
+-(void)htmlStringDidUpdateColor:(NMHTMLString *)htmlString{
+	[self redraw];
+}
+
+-(void)htmlStringShouldEnableUserInteraction:(NMHTMLString *)htmlString{
+	self.userInteractionEnabled = YES;
+}
+
 
 @end
+
+
+
+
+

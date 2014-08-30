@@ -1,10 +1,8 @@
 //
 //  NMCustomLabel.h
-//  NewsMe
 //
-//  Created by Robert Haining on 8/30/11.
+//  Created by Robert Haining
 //
-//  Copyright 2012, News.me
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -23,24 +21,31 @@
 #import <UIKit/UIKit.h>
 #import <CoreText/CoreText.h>
 #import "NMCustomLabelStyle.h"
+#import "NMHTMLString.h"
 
-typedef enum{
-	kNMTextTypeNone=0,
-	kNMTextTypeUsername=1,
-	kNMTextTypeLink=2
-}kNMTextType;
-
-typedef enum{
-	kNMShouldLinkNothing	= 0,
-	kNMShouldLinkUsernames	= 1 << 0,
-	kNMShouldLinkURLs		= 2 << 0
-}kNMShouldLink;
 
 @class NMCustomLabel;
+@protocol NMCustomLabelDelegate;
+
+typedef enum{
+	kNMAlignTop=0,
+	kNMAlignCenter=1,
+	kNMAlignBottom=2
+} kNMLabelVerticalAlign;
+
+@interface NMCustomLabel : UILabel <UIGestureRecognizerDelegate, NMHTMLStringDelegate>
+
+@property (nonatomic, readonly) NMHTMLString *htmlString;
+@property (nonatomic, weak) id<NMCustomLabelDelegate> delegate;
+@property (nonatomic) kNMLabelVerticalAlign verticalAlign;
+@property (nonatomic, readonly) UILongPressGestureRecognizer *pressRecog;
+
+-(void)redraw;
+
+@end
 
 @protocol NMCustomLabelDelegate <NSObject>
 @optional
-//-(void)customLabel:(NMCustomLabel *)customLabel didAddGestureRecog:(UILongPressGestureRecognizer *)recog;
 -(void)customLabelDidBeginTouch:(NMCustomLabel *)customLabel recog:(UILongPressGestureRecognizer *)recog;
 -(void)customLabelDidBeginTouchOutsideOfHighlightedText:(NMCustomLabel *)customLabel recog:(UILongPressGestureRecognizer *)recog;
 -(void)customLabel:(NMCustomLabel *)customLabel didChange:(UILongPressGestureRecognizer *)recog;
@@ -50,41 +55,3 @@ typedef enum{
 @end
 
 
-@interface NMCustomLabel : UILabel <UIGestureRecognizerDelegate> {
-	CTFramesetterRef framesetter;
-	CTFrameRef ctFrame;
-	CFMutableAttributedStringRef attrString;
-	
-	BOOL shouldTruncate;
-	
-	CGColorRef backgroundCGColor;
-	
-	UILongPressGestureRecognizer *pressRecog;
-	BOOL recogOutOfBounds;
-	CGFloat highlightedTextIndex;
-	NSString *highlightedText;
-	kNMTextType highlightedTextType;
-	
-	NSMutableDictionary *styles;
-}
-
-@property (nonatomic, readonly) NSString *cleanText;
-@property (nonatomic) CTTextAlignment ctTextAlignment;
-@property (nonatomic, strong) UIColor *linkColor;
-@property (nonatomic, strong) UIColor *activeLinkColor;
-@property (nonatomic) CGFloat lineHeight;
-@property (nonatomic) int numberOfLines;
-@property (nonatomic) BOOL shouldBoldAtNames;
-@property (nonatomic) kNMShouldLink shouldLinkTypes;
-@property (nonatomic) CGFloat kern;
-@property (nonatomic, weak) id<NMCustomLabelDelegate> delegate;
-
--(BOOL)hasHighlightedText;
-+(NSRegularExpression *)usernameRegEx;
-+(NSRegularExpression *)hashtagRegEx;
-
--(void)setDefaultStyle:(NMCustomLabelStyle *)style;
--(void)setStyle:(NMCustomLabelStyle *)style forKey:(NSString *)key;
-
-
-@end

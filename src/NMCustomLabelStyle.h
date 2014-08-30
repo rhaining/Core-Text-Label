@@ -1,9 +1,7 @@
 //
 //  NMCustomLabelStyle.h
-//  Banana Stand
 //
-//  Created by Robert Haining on 6/18/12.
-//  Copyright (c) 2012 News.me. All rights reserved.
+//  Created by Robert Haining
 //
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,8 +23,10 @@
 
 extern NSString * const NMCustomLabelStyleDefaultKey;
 extern NSString * const NMCustomLabelStyleBoldKey;
+extern NSString * const NMCustomLabelStyleItalicKey;
+extern NSString * const NMCustomLabelStyleMarkKey;
 
-@interface NMCustomLabelStyle : NSObject
+@interface NMCustomLabelStyle : NSObject <NSCopying> 
 
 @property (nonatomic, copy) NSString *fontName;
 @property (nonatomic) CGFloat fontSize;
@@ -34,11 +34,19 @@ extern NSString * const NMCustomLabelStyleBoldKey;
 @property (nonatomic, strong) UIImage *image;
 @property (nonatomic) CGFloat imageVerticalOffset;
 
-@property (nonatomic, readonly) CTFontRef fontRef;
-@property (nonatomic, readonly) CGColorRef colorRef;
+@property (nonatomic, readonly) UIFont *font;
+
+@property (nonatomic, strong) UIColor *backgroundColor;
+
+@property (nonatomic, readonly) NSShadow *shadow;
+@property (nonatomic) CGSize shadowOffset;
+@property (nonatomic) CGFloat shadowBlurRadius;
+@property (nonatomic, strong) UIColor *shadowColor;
 
 +(id)styleWithFont:(UIFont *)font color:(UIColor *)color;
 +(id)styleWithImage:(UIImage *)image verticalOffset:(CGFloat)verticalOffset;
 +(id)styleWithImage:(UIImage *)image;
+
+-(void)setFont:(UIFont *)font;
 
 @end

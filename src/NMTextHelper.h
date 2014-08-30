@@ -1,5 +1,5 @@
 //
-//  NMViewController.h
+//  NMTextHelper.h
 //
 //  Created by Robert Haining
 //
@@ -18,9 +18,22 @@
 //
 //
 
-#import <UIKit/UIKit.h>
-#import "NMCustomLabel.h"
+#import <Foundation/Foundation.h>
 
-@interface NMViewController : UIViewController <NMCustomLabelDelegate>
+@interface NMTextHelper : NSObject
+
++(NSRegularExpression *)usernameRegEx;
++(NSRegularExpression *)usernameEndRegEx;
++(NSRegularExpression *)hashtagRegEx;
++(NSRegularExpression *)tagRegEx;
++(NSRegularExpression *)markTagRegEx;
++(NSRegularExpression *)spanTagRegEx;
++(NSRegularExpression *)shortTagRegEx;
++(NSRegularExpression *)anchorTagRegEx;
+
++(NSCharacterSet *)emojiCharacterSet;
++(NSCharacterSet *)alphaNumericCharacterSet;
+
++(BOOL)textIsBaseRTL:(NSString *)text;
 
 @end

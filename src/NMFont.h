@@ -1,5 +1,5 @@
 //
-//  NMViewController.h
+//  NMFont.h
 //
 //  Created by Robert Haining
 //
@@ -18,9 +18,14 @@
 //
 //
 
-#import <UIKit/UIKit.h>
-#import "NMCustomLabel.h"
+#import <Foundation/Foundation.h>
 
-@interface NMViewController : UIViewController <NMCustomLabelDelegate>
+@interface NMFont : NSObject
+
++(CGFloat)adjustContentSizeForContentSizeCategory:(CGFloat)fontSize;
+
++(UIFont *)fontAdjustedForContentSizeCategory:(UIFont *)font;
+
++(UIFont *)fontWithName:(NSString *)fontName size:(CGFloat)fontSize;
 
 @end
