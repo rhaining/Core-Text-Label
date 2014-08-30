@@ -18,7 +18,7 @@ Currently supporting iOS 6.0+.
 ```
 
 ## About Digg
-This library was originally written by @rhaining at [Digg](http://digg.com/), a small team based out of [betaworks](http://betaworks.com/) in New York City. Digg delivers the most interesting and talked about stories on the Internet right now.
+This library was originally written by [@rhaining](/rhaining) at [Digg](http://digg.com/), a small team based out of [betaworks](http://betaworks.com/) in New York City. Digg delivers the most interesting and talked about stories on the Internet right now.
 
 ## About this project
 This library was introduced as a part Rob's talk at the [Brooklyn iOS Dev Meetup](http://www.meetup.com/The-Brooklyn-iPhone-and-iPad-Developer-Meetup/). See slides & more at [bit.ly/bkiosmeetup](http://bit.ly/bkiosmeetup).
